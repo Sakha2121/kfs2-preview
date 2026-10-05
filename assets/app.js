@@ -327,9 +327,9 @@
           </div>`}
         </div>
         <div class="card tile spot reveal" style="--d:.05s"><div class="tile-lbl">Runners</div><div><div class="tile-val num" data-count="${week.runners}">0</div><div class="tile-sub">${trend(week.runners, prev && prev.runners)}</div></div></div>
-        <div class="card tile spot reveal" style="--d:.1s"><div class="tile-lbl">Runs logged</div><div><div class="tile-val num" data-count="${week.runs}">0</div><div class="tile-sub">${trend(week.runs, prev && prev.runs)}</div></div></div>
-        <div class="card tile spot reveal" style="--d:.15s"><div class="tile-lbl">Avg per runner</div><div><div class="tile-val num"><span data-count="${r1(week.km / week.runners)}" data-dec="1">0</span><small>km</small></div><div class="tile-sub">${plural(list.filter(a => a.distance >= 10).length, 'runner')} hit 10 km+</div></div></div>
-        <div class="card tile spot reveal" style="--d:.2s"><div class="tile-lbl">Fastest pace</div><div><div class="tile-val num">${fast ? esc(fast.pace) : '--'}<small>/km</small></div><div class="tile-sub">${fast ? esc(pretty(fast.name)) : 'Runs of 3 km+'}</div></div></div>
+        <div class="card tile spot reveal" style="--d:.1s"><div class="tile-lbl" data-short="Runs">Runs logged</div><div><div class="tile-val num" data-count="${week.runs}">0</div><div class="tile-sub">${trend(week.runs, prev && prev.runs)}</div></div></div>
+        <div class="card tile spot reveal" style="--d:.15s"><div class="tile-lbl" data-short="Avg km">Avg per runner</div><div><div class="tile-val num"><span data-count="${r1(week.km / week.runners)}" data-dec="1">0</span><small>km</small></div><div class="tile-sub">${plural(list.filter(a => a.distance >= 10).length, 'runner')} hit 10 km+</div></div></div>
+        <div class="card tile spot reveal" style="--d:.2s"><div class="tile-lbl" data-short="Best pace">Fastest pace</div><div><div class="tile-val num">${fast ? esc(fast.pace) : '--'}<small>/km</small></div><div class="tile-sub">${fast ? esc(pretty(fast.name)) : 'Runs of 3 km+'}</div></div></div>
       </div>
       <div data-podium></div>
       ${(flat ? x => `<div class="flat-sec">${x}</div>` : x => band('Board', x))(secHead('Full leaderboard', plural(list.length, 'runner')) + '<div class="card board reveal" data-board></div>')}`;
@@ -725,6 +725,35 @@
   let active = null;
 
   // Scroll target that puts the section heading just below the nav.
+  // Phones: the week title stays on one line, sized to fill the column.
+  const phone = matchMedia('(max-width: 640px)');
+  function fitDates() {
+    $$('.h2-date').forEach(h => {
+      h.style.fontSize = '';
+      if (!phone.matches || !h.clientWidth) return;
+      h.style.fontSize = '100px';
+      h.style.fontSize = Math.min(40, Math.floor(100 * h.clientWidth / h.scrollWidth * 0.98)) + 'px';
+    });
+  }
+  // Phones: stretch the week title → top 3 block so a screenshot taken from the
+  // tab's landing position ends right at the podium, with room for the tab bar.
+  const absTop = el => { let y = 0; for (; el; el = el.offsetParent) y += el.offsetTop; return y; };
+  function fitFrame() {
+    const v = $('.view.active');
+    if (!v) return;
+    v.style.removeProperty('--fx');
+    const head = $(':scope > .view-head', v), pod = $(':scope > [data-league] > .podium', v);
+    if (!phone.matches || !head || !pod) return;
+    const nav = $('.nav'), tb = $('.tabbar');
+    const top = nav.offsetTop + nav.offsetHeight + 14;                            // where boardTop() parks the heading
+    const bottom = innerHeight - tb.offsetHeight - parseFloat(getComputedStyle(tb).bottom) - 12;
+    const natural = absTop(pod) + pod.offsetHeight - absTop(head);
+    v.style.setProperty('--fx', Math.round(bottom - top - natural) + 'px');
+  }
+  const fitPhone = () => { fitDates(); fitFrame(); };
+  addEventListener('resize', fitPhone);
+  if (document.fonts) document.fonts.ready.then(fitPhone);
+
   function boardTop() {
     const main = $('#main'), nav = $('.nav');
     return main.getBoundingClientRect().top + scrollY + parseFloat(getComputedStyle(main).paddingTop) - (nav ? nav.offsetTop + nav.offsetHeight : 0) - 14;
@@ -749,6 +778,7 @@
     }
     $$('[role="tab"][data-route]').forEach(b => b.setAttribute('aria-selected', ROUTES[b.dataset.route] === view));
     moveIndicators();
+    fitPhone();
     if (scroll) {
       const top = boardTop();
       scrollTo({ top, behavior: K.reduce ? 'auto' : 'smooth' });

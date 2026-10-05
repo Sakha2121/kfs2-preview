@@ -899,35 +899,53 @@ html.intro:not(.intro-leaving) .hero .fade-up { animation-play-state: paused; }
   .marquee { padding: 11px 0; }
   .main { padding-top: 56px; min-height: 0; }
   .meta-winner { display: none; }   /* the podium right below already shows the winner */
-  .view-head { margin-bottom: 20px; }
-  .h2.h2-date { font-size: clamp(34px, 6vw, 72px); }
-  .head-meta { text-align: left; }
-  .tile { padding: 16px; min-height: 112px; }
-  .tile.big { padding: 20px; }
-  .tile-val { font-size: 34px; }
-  .tile.big .tile-val { font-size: 64px; }
-  .ring { width: 88px; height: 88px; }
-  /* podium: winner gets a full-width card, 2nd and 3rd share the row below */
-  .podium { grid-template-columns: 1fr 1fr; grid-template-areas: "first first" "second third"; align-items: stretch; gap: 10px; }
-  .pod { padding: 16px; border-radius: 18px; min-height: 0; }
+  /* ── screenshot frame: week title → top 3 fills one phone screen ──────────
+     app.js sets --fx on the week views: the room left between the podium and
+     the tab bar. It's shared out across the gaps, the bar chart and the podium
+     cards (shares add up to 1), so the top 3 always ends just above the tab bar. */
+  .view-head { margin-bottom: max(10px, calc(16px + var(--fx, 0px) * .08)); gap: 4px; }
+  .view-head > div:first-child { flex: 1 1 100%; min-width: 0; }
+  .h2.h2-date { white-space: nowrap; font-size: 28px; }   /* app.js fits it to the column */
+  .head-meta { text-align: left; font-size: 12px; }
+  .head-meta br { display: none; }
+  .bento { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
+  .tile { min-height: 0; }
+  .tile.big { grid-column: 1 / -1; grid-row: auto; padding: 18px 20px 16px; margin-bottom: max(8px, calc(10px + var(--fx, 0px) * .04)); }
+  .tile.big .tile-val { font-size: 60px; margin-top: 6px; }
+  .tile.big .tile-sub { margin-top: 6px; }
+  .ring { width: 78px; height: 78px; }
+  .spark-area { margin-top: 18px; height: max(26px, calc(44px + var(--fx, 0px) * .26)); }
+  /* the four small stats become one joined strip */
+  .tile:not(.big) { padding: max(10px, calc(14px + var(--fx, 0px) * .04)) 12px max(11px, calc(15px + var(--fx, 0px) * .04)); border-radius: 0; border-left-width: 0; box-shadow: none; justify-content: flex-start; }
+  .bento > .tile:not(.big):is(:first-child, .big + .tile) { border-left-width: 1px; border-radius: 16px 0 0 16px; }
+  .bento > .tile:not(.big):last-child { border-radius: 0 16px 16px 0; }
+  .tile:not(.big) .tile-lbl { font-size: 10.5px; letter-spacing: .05em; white-space: nowrap; }
+  .tile:not(.big) .tile-lbl[data-short] { font-size: 0; gap: 0; }
+  .tile:not(.big) .tile-lbl[data-short]::after { content: attr(data-short); font-size: 10.5px; }
+  .tile:not(.big) .tile-val { font-size: 26px; margin-top: 8px; white-space: nowrap; }
+  .tile:not(.big) .tile-sub { display: none; }
+  /* podium: winner full width, 2nd and 3rd side by side, avatar beside the name */
+  .podium { grid-template-columns: 1fr 1fr; grid-template-areas: "first first" "second third"; align-items: stretch; gap: max(8px, calc(10px + var(--fx, 0px) * .04)) 10px; margin-top: max(8px, calc(10px + var(--fx, 0px) * .04)); }
+  .pod { padding: max(7px, calc(15px + var(--fx, 0px) * .11)) 16px; border-radius: 18px; min-height: 0; }
   .pod-1 { grid-area: first; } .pod-2 { grid-area: second; } .pod-3 { grid-area: third; }
-  .pod-2, .pod-3 { min-height: 172px; }
-  .pod-rank { font-size: 76px; top: -10px; bottom: auto; right: -2px; }
-  .pod-medal { font-size: 10px; padding: 3px 9px; }
-  .av-lg, .pod .av-lg { width: 44px; height: 44px; font-size: 15px; }
-  .pod-name { font-size: 17px; }
-  .pod-km { font-size: 28px; }
-  .pod-meta { font-size: 11px; }
-  .pod-1:not(.pod-empty) {
-    display: grid; grid-template-columns: 60px minmax(0, 1fr); column-gap: 14px; row-gap: 3px; align-items: center;
-    grid-template-areas: "medal medal" "av name" "av km" "av meta"; padding: 18px 20px 20px;
+  .pod:not(.pod-empty) {
+    display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: 12px; row-gap: 2px; align-items: center; align-content: center;
+    grid-template-areas: "medal medal" "av name" "av km" "meta meta";
   }
-  .pod-1 .pod-medal { grid-area: medal; justify-self: start; margin-bottom: 12px; }
-  .pod-1 .av, .pod-1 .av-lg { grid-area: av; margin: 0; width: 60px; height: 60px; font-size: 19px; }
-  .pod-1 .pod-name { grid-area: name; font-size: 22px; align-self: end; }
-  .pod-1 .pod-km { grid-area: km; font-size: 36px; margin-top: 2px; }
-  .pod-1 .pod-meta { grid-area: meta; align-self: start; font-size: 12px; }
-  .pod-1 .pod-rank { font-size: 150px; top: auto; bottom: -34px; right: 10px; }
+  .pod-medal { grid-area: medal; justify-self: start; margin-bottom: 8px; font-size: 10px; padding: 3px 9px; }
+  .pod .av, .pod .av-lg { grid-area: av; margin: 0; width: 40px; height: 40px; font-size: 13px; }
+  .pod-name { grid-area: name; font-size: 16px; align-self: end; }
+  .pod-km { grid-area: km; font-size: 27px; margin-top: 0; align-self: start; }
+  .pod-meta { grid-area: meta; font-size: 11px; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pod-rank { font-size: 64px; top: -6px; bottom: auto; right: -2px; }
+  .pod-1:not(.pod-empty) { grid-template-columns: 58px minmax(0, 1fr); column-gap: 16px; grid-template-areas: "av medal" "av name" "av km" "av meta"; padding-inline: 18px; padding-block: max(7px, calc(15px + var(--fx, 0px) * .12)); }
+  .pod-1 .pod-medal { margin-bottom: 6px; }
+  .pod-1 .av, .pod-1 .av-lg { width: 58px; height: 58px; font-size: 19px; }
+  .pod-1 .pod-name { font-size: 22px; }
+  .pod-1 .pod-km { font-size: 38px; }
+  .pod-1 .pod-meta { margin-top: 4px; font-size: 12px; }
+  .pod-1 .pod-rank { font-size: 132px; top: auto; bottom: -30px; right: 8px; }
+  #view-week .band, #view-last .band { margin-top: 112px; }   /* keep the board below the fold */
   .board-tools { padding: 10px; }
   .search { flex-basis: 100%; }
   .board-head { display: none; }
