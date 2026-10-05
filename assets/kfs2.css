@@ -329,6 +329,7 @@ input { font: inherit; color: inherit; }
 /* ── section rhythm: headers, bands, spacing ──────────────── */
 .sec-head { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
 .sec-head.spaced { margin-top: clamp(56px, 7vw, 96px); }
+.band + .sec-head.spaced { margin-top: clamp(40px, 5vw, 64px); }
 .sec-title {
   display: inline-flex; align-items: center; gap: 10px;
   font-family: var(--font-display); font-weight: 800; font-stretch: 112%;
@@ -390,6 +391,7 @@ input { font: inherit; color: inherit; }
 .tile-val small { font-size: .42em; font-weight: 700; color: var(--muted); margin-left: 4px; font-stretch: 100%; }
 .tile-sub { font-size: 12px; color: var(--muted); margin-top: 6px; }
 .tile.big .tile-val { font-size: clamp(64px, 8vw, 112px); }
+.tile.big.no-spark { justify-content: center; }
 .big-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
 .ring { width: 100px; height: 100px; flex-shrink: 0; }
 .ring circle { fill: none; stroke-width: 9; }
@@ -504,7 +506,7 @@ input { font: inherit; color: inherit; }
 .who { grid-area: who; min-width: 0; }
 .nm { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; }
 .nm-txt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sub { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sub { display: block; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sub b { font-weight: 500; transition: color .3s; }
 [data-sort="runs"] .sub b[data-k="runs"], [data-sort="longest"] .sub b[data-k="longest"], [data-sort="weeks"] .sub b[data-k="weeks"] { color: var(--accent); font-weight: 600; }
 [data-sort="pace"] .pace { color: var(--accent); }
@@ -548,10 +550,18 @@ input { font: inherit; color: inherit; }
 }
 .mini-foot { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-top: 6px; }
 .board-empty { padding: 40px 20px; text-align: center; color: var(--muted); }
+.board-more {
+  display: flex; width: 100%; align-items: center; justify-content: center; gap: 8px; padding: 16px;
+  border: 0; border-top: 1px solid var(--line); background: none; color: var(--text);
+  font: 600 14px var(--font-body); cursor: pointer; transition: background .2s;
+}
+.board-more:hover { background: var(--surface-2); }
+.board-more[hidden] { display: none; }
 .empty-state { padding: 56px 24px; text-align: center; }
 .empty-state .big-emoji { font-size: 44px; margin-bottom: 10px; animation: bob 2.4s ease-in-out infinite; }
 @keyframes bob { 50% { transform: translateY(-6px) rotate(-4deg); } }
 .empty-state p { color: var(--muted); margin: 6px 0 18px; }
+.empty-ctas { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 
 /* ── history chart ─────────────────────────────────────────── */
 .chart-card { padding: 22px 22px 16px; overflow: visible; }
@@ -589,7 +599,7 @@ input { font: inherit; color: inherit; }
 .tip.show { opacity: 1; transform: translate(-50%, calc(-100% - 12px)); }
 .tip strong { display: block; font-size: 13px; margin-bottom: 4px; }
 .tip-row { display: flex; justify-content: space-between; gap: 14px; opacity: .8; }
-.week-chips { margin: 16px 0 0; padding-bottom: 2px; scroll-snap-type: x mandatory; }
+.week-chips { margin: 16px 0 0; padding-bottom: 2px; scroll-snap-type: x mandatory; -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 48px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 48px), transparent); }
 .week-chips .chip { scroll-snap-align: start; }
 .week-panel { margin-top: 40px; }
 .week-panel-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
@@ -613,6 +623,7 @@ input { font: inherit; color: inherit; }
 .track-ends { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 8px; }
 
 /* ── records ───────────────────────────────────────────────── */
+.rec-podium { margin-top: 16px; }
 .rec-podium .pod-km { font-size: clamp(26px, 3.2vw, 40px); }
 .rec-list { margin-top: 12px; }
 .rec-list .row-main { grid-template-columns: 34px 40px minmax(0, 1fr) 90px 72px; grid-template-areas: "rank av who dist pace"; cursor: default; }
@@ -754,6 +765,8 @@ input { font: inherit; color: inherit; }
 .team-title .accent { color: var(--accent); }
 .team-intro { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-top: 28px; }
 .team-intro p { max-width: 460px; color: var(--text-2); font-size: 17px; }
+.only-touch { display: none; }
+@media (hover: none) { .only-hover { display: none; } .only-touch { display: inline; } }
 .team-wrap { max-width: var(--wrap); margin: 0 auto; padding: 20px var(--gutter) 0; }
 .team-label { display: flex; align-items: center; gap: 14px; margin: 48px 0 18px; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
 .team-label::after { content: ""; flex: 1; height: 1px; background: var(--line); }
@@ -842,10 +855,18 @@ html.intro:not(.intro-leaving) .hero .fade-up { animation-play-state: paused; }
   .nav-actions { margin-left: auto !important; }
   .tabbar { display: grid; }
   .footer { padding-bottom: 130px; }
+  .hero { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }   /* keep CTAs clear of the tab bar */
   .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ind-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .team-grid, .crew-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .detail { grid-template-columns: 1fr; padding-left: 18px; }
+}
+/* tablet only: one row of four stat tiles under the full-width distance card */
+@media (min-width: 641px) and (max-width: 980px) {
+  .bento { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .tile.big { grid-column: 1 / -1; grid-row: auto; }
+  .tile-val { font-size: 34px; }
+  .hero-sub { max-width: 380px; }
 }
 @media (max-width: 640px) {
   .sec-head { gap: 10px; }
@@ -863,11 +884,11 @@ html.intro:not(.intro-leaving) .hero .fade-up { animation-play-state: paused; }
   .brand-word { display: none; }
   .nav-team { display: none; }
   .nav .btn { height: 38px; padding: 0 14px; }
-  .hero { padding-top: 100px; padding-bottom: 36px; }
+  .hero { padding-top: 100px; padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
   .hero::after { display: none; }
   .hero-title { font-size: 15vw; font-stretch: 100%; }
   .hero-bottom { display: flex; flex-direction: column; align-items: stretch; gap: 20px; }
-  .scroll-badge { order: 3; align-self: center; width: 104px; height: 104px; margin: 4px 0 26px; }
+  .scroll-badge { order: 3; align-self: center; width: 96px; height: 96px; margin: 0; }
   .scroll-core { width: 48px; height: 48px; }
   .hero-ctas .btn { flex: 1; }
   .countdown { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; }
@@ -876,7 +897,8 @@ html.intro:not(.intro-leaving) .hero .fade-up { animation-play-state: paused; }
   .cd-val { font-size: 26px; }
   .cd-sep { font-size: 20px; }
   .marquee { padding: 11px 0; }
-  .main { padding-top: 56px; }
+  .main { padding-top: 56px; min-height: 0; }
+  .meta-winner { display: none; }   /* the podium right below already shows the winner */
   .view-head { margin-bottom: 20px; }
   .h2.h2-date { font-size: clamp(34px, 6vw, 72px); }
   .head-meta { text-align: left; }
@@ -912,9 +934,9 @@ html.intro:not(.intro-leaving) .hero .fade-up { animation-play-state: paused; }
   .board-head, .row-main {
     grid-template-columns: 26px 36px minmax(0, 1fr) auto;
     grid-template-areas: "rank av who dist" "rank av bar pace";
-    column-gap: 10px; row-gap: 6px; padding: 12px 14px;
+    column-gap: 10px; row-gap: 5px; padding: 11px 14px;
   }
-  .row-main .av { width: 36px; height: 36px; font-size: 12px; align-self: center; }
+  .row-main .av { width: 34px; height: 34px; font-size: 12px; align-self: center; }
   .rank { font-size: 16px; align-self: center; }
   .nm { font-size: 14px; }
   .sub { font-size: 11px; }
@@ -929,14 +951,21 @@ html.intro:not(.intro-leaving) .hero .fade-up { animation-play-state: paused; }
   .chart-card { padding: 16px 14px 12px; }
   .chart { height: 200px; gap: 5px; }
   .wbar { flex: 0 0 30px; }
-  .ind-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-  .ind { padding: 16px; min-height: 0; }
-  .ind-val { font-size: 40px; }
+  /* individual records: swipeable row, next card peeks in */
+  .ind-grid {
+    display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+    margin-inline: calc(-1 * var(--gutter)); padding: 2px var(--gutter) 6px; scroll-padding-inline: var(--gutter);
+  }
+  .ind-grid::-webkit-scrollbar { display: none; }
+  .ind { flex: 0 0 80%; scroll-snap-align: start; padding: 20px; min-height: 0; }
+  .ind-val { font-size: 46px; }
   .ind-viz { height: 80px; }
   .viz-cap { white-space: normal; line-height: 1.3; }
   .trk-tick.t5 span { display: none; }
   .club-grid { grid-template-columns: 1fr; }
-  .club { padding: 22px; }
+  .club { flex-direction: column; align-items: flex-start; gap: 14px; padding: 22px; }
+  .club-val { font-size: 64px; }
+  .club-week { font-size: 17px; }
   .earth { grid-template-columns: 1fr; padding: 20px; gap: 16px; }
   .earth-globe { width: 64px; height: 64px; }
   .rec-list .row-main { grid-template-columns: 26px 36px minmax(0, 1fr) auto; grid-template-areas: "rank av who dist" "rank av who pace"; }
@@ -956,6 +985,8 @@ html.intro:not(.intro-leaving) .hero .fade-up { animation-play-state: paused; }
   .member-name { font-size: 20px; }
   .member-role { font-size: 12px; }
   .member-info { padding: 10px 4px 4px; }
+  .crew-grid { grid-template-columns: 1fr; }   /* a lone crew card goes full width, landscape */
+  .crew-grid .member-photos { aspect-ratio: 4 / 3; }
   .join-band::before { width: 320px; bottom: -12%; }
 }
 @media (hover: none) {

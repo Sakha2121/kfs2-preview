@@ -166,6 +166,7 @@
       </div>
       <div class="board-head"><span>#</span><span class="h-who">Athlete</span><span class="h-bar"></span><span class="h-dist">${mode === 'all' ? 'Total' : 'Distance'}</span><span class="h-pace">${mode === 'all' ? 'Runs' : 'Best pace'}</span></div>
       <div class="rows"></div>
+      <button class="board-more" type="button" hidden></button>
       <div class="board-empty" hidden>No runner matches “<span></span>”.</div>`;
     host.dataset.sort = sorts[0][0];
     const list = $('.rows', host);
@@ -180,6 +181,10 @@
       list.appendChild(el);
     });
     let key = sorts[0][0], q = '';
+    // phones get a shorter first page; small overflows aren't worth a button
+    const limit = matchMedia('(max-width: 640px)').matches ? 10 : 15;
+    let expanded = rows.length <= limit + 3;
+    const more = $('.board-more', host);
 
     function apply(animate) {
       const before = new Map();
@@ -191,10 +196,13 @@
         $('.rank', el).textContent = String(i + 1).padStart(2, '0');
         ['p1', 'p2', 'p3'].forEach((c, j) => el.classList.toggle(c, i === j));
         const hit = !q || pretty(r.name).toLowerCase().includes(q);
-        el.hidden = !hit;
+        el.hidden = !hit || (!q && !expanded && i >= limit);
         if (hit) shown++;
         list.appendChild(el);
       });
+      more.hidden = !!q || rows.length <= limit + 3;
+      more.innerHTML = expanded ? `Show top ${limit} only <span aria-hidden="true">↑</span>` : `Show all ${rows.length} runners <span aria-hidden="true">↓</span>`;
+      more.setAttribute('aria-expanded', expanded);
       const empty = $('.board-empty', host);
       empty.hidden = shown > 0;
       $('span', empty).textContent = q;
@@ -206,6 +214,11 @@
     }
     apply(false);
 
+    more.addEventListener('click', () => {
+      expanded = !expanded;
+      apply(false);
+      if (!expanded) host.scrollIntoView({ behavior: K.reduce ? 'auto' : 'smooth', block: 'start' });
+    });
     host.addEventListener('click', e => {
       const chip = e.target.closest('.chip[data-sort]');
       if (chip) {
@@ -228,7 +241,7 @@
       focus(name) {
         const el = [...nodes.values()].find(n => n.dataset.name === name);
         if (!el) return;
-        if (el.hidden) { $('input', host).value = ''; q = ''; apply(false); }
+        if (el.hidden) { $('input', host).value = ''; q = ''; expanded = true; apply(false); }
         if (!el.classList.contains('open')) $('.row-main', el).click();
         el.scrollIntoView({ behavior: K.reduce ? 'auto' : 'smooth', block: 'center' });
         el.animate([{ boxShadow: 'inset 3px 0 0 #FC4C02' }, { boxShadow: 'inset 3px 0 0 transparent' }], { duration: 1600 });
@@ -286,7 +299,7 @@
     return `<div class="card empty-state reveal"><div class="big-emoji">👟</div>
       <h3 class="h3" style="margin:0">Fresh week, empty board</h3>
       <p>The leaderboard resets every Monday. Log a run on Strava to claim the top spot.</p>
-      <button class="btn btn-primary" data-open="join">Join the club <span class="arrow">→</span></button></div>`;
+      <div class="empty-ctas"><button class="btn btn-primary" data-open="join">Join the club <span class="arrow">→</span></button>${lastWeek ? `<a class="btn btn-ghost" href="#last-week" data-route="last-week">See last week's board</a>` : ''}</div></div>`;
   }
 
   // Stats bento + podium + board for one week.
@@ -299,7 +312,7 @@
     const isRecord = week.km >= recordKm;
     el.innerHTML = `
       <div class="bento">
-        <div class="card tile big spot reveal" data-scrub-tile>
+        <div class="card tile big spot reveal${flat ? ' no-spark' : ''}" data-scrub-tile>
           <div class="tile-lbl" data-big-lbl>${week.live ? 'Total distance, so far this week' : 'Total distance'}</div>
           <div class="big-row">
             <div>
@@ -308,10 +321,10 @@
             </div>
             ${ring(pct, 'of record')}
           </div>
-          <div class="spark-area" tabindex="0" role="slider" aria-label="Weekly club distance. Use arrow keys to scrub." aria-valuemin="1" aria-valuemax="${weeks.length}" aria-valuenow="${week.idx + 1}">
+          ${flat ? '' : `<div class="spark-area" tabindex="0" role="slider" aria-label="Weekly club distance. Use arrow keys to scrub." aria-valuemin="1" aria-valuemax="${weeks.length}" aria-valuenow="${week.idx + 1}">
             <span class="spark-tip" aria-hidden="true"></span>
             ${weeks.map((w, i) => `<i class="${w === week ? 'cur' : ''}${w.km >= recordKm ? ' rec' : ''}" style="--h:${(w.km / maxWeekKm * 100).toFixed(1)}%;--i:${i}"></i>`).join('')}
-          </div>
+          </div>`}
         </div>
         <div class="card tile spot reveal" style="--d:.05s"><div class="tile-lbl">Runners</div><div><div class="tile-val num" data-count="${week.runners}">0</div><div class="tile-sub">${trend(week.runners, prev && prev.runners)}</div></div></div>
         <div class="card tile spot reveal" style="--d:.1s"><div class="tile-lbl">Runs logged</div><div><div class="tile-val num" data-count="${week.runs}">0</div><div class="tile-sub">${trend(week.runs, prev && prev.runs)}</div></div></div>
@@ -325,7 +338,7 @@
     $('[data-podium]', el).replaceWith(podium(list.slice(0, 3).map(a => ({
       name: a.name, count: a.distance, unit: 'km', meta: `${plural(a.runs, 'run')} · ${validPace(a) ? a.pace + '/km' : '--'}`,
     })), name => board.focus(name)));
-    scrubber($('[data-scrub-tile]', el), week);
+    if (!flat) scrubber($('[data-scrub-tile]', el), week);
     K.reveal(el);
   }
 
@@ -435,7 +448,7 @@
     if (!lastWeek) { el.innerHTML = head('Last week', 'No archive yet'); return; }
     const w = lastWeek.athletes[0];
     el.innerHTML = head('Last week · Final', esc(lastWeek.label),
-      w ? `Winner<br><strong>${esc(pretty(w.name))} · ${w.distance} km</strong>` : '', '', 'h2-date') + '<div data-league></div>';
+      w ? `<span class="meta-winner">Winner<br><strong>${esc(pretty(w.name))} · ${w.distance} km</strong></span>` : '', '', 'h2-date') + '<div data-league></div>';
     renderLeague($('[data-league]', el), lastWeek);
   }
 
