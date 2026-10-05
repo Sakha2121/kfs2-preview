@@ -6,6 +6,7 @@
   --bg: #0A0A0B;
   --bg-2: #0F0F11;
   --band: #121215;
+  --spark: #4A4A54;
   --surface: #141417;
   --surface-2: #1A1A1E;
   --surface-3: #25252B;
@@ -37,6 +38,7 @@
   --bg: #F4F1EC;
   --bg-2: #EDE9E2;
   --band: #E9E3D9;
+  --spark: #CBC1B2;
   --surface: #FFFFFF;
   --surface-2: #F8F5F0;
   --surface-3: #ECE7DF;
@@ -396,13 +398,13 @@ input { font: inherit; color: inherit; }
 .in .ring .fill, .ring.in .fill { stroke-dashoffset: var(--off, 289); }
 .ring text { fill: var(--text); font-family: var(--font-display); font-weight: 800; font-stretch: 80%; font-size: 22px; }
 .ring .ring-sub { fill: var(--muted); font-family: var(--font-body); font-weight: 600; font-size: 9px; letter-spacing: .08em; }
-.spark-area { position: relative; margin-top: 44px; height: 46px; display: flex; align-items: flex-end; gap: 3px; cursor: pointer; touch-action: pan-y; outline: none; border-radius: 6px; }
+.spark-area { position: relative; margin-top: 44px; height: 46px; display: flex; align-items: flex-end; gap: 3px; cursor: crosshair; touch-action: pan-y; outline: none; border-radius: 6px; }
 .spark-area:focus-visible { box-shadow: 0 0 0 2px var(--accent); }
-.spark-area i { flex: 1; height: var(--h); min-height: 3px; border-radius: 3px; background: var(--surface-3); transform-origin: bottom; transform: scaleY(0); transition: transform .9s var(--ease), background .25s, opacity .25s; transition-delay: calc(var(--i) * 18ms), 0s, 0s; pointer-events: none; }
+.spark-area i { flex: 1; height: var(--h); min-height: 3px; border-radius: 3px; background: var(--spark); transform-origin: bottom; transform: scaleY(0); transition: transform .9s var(--ease), background .25s, opacity .25s; transition-delay: calc(var(--i) * 18ms), 0s, 0s; pointer-events: none; }
 .spark-area i.cur { background: var(--accent); }
 .in .spark-area i { transform: scaleY(var(--s, 1)); }
-.spark-area.scrubbing i { transition: transform .32s var(--ease), background .2s, opacity .2s; transition-delay: 0s; opacity: .45; }
-.spark-area.scrubbing i.near { opacity: .8; background: color-mix(in srgb, var(--accent) 35%, var(--surface-3)); }
+.spark-area.scrubbing i { transition: transform .32s var(--ease), background .2s, opacity .2s; transition-delay: 0s; opacity: .6; }
+.spark-area.scrubbing i.near { opacity: .9; background: color-mix(in srgb, var(--accent) 45%, var(--spark)); }
 .spark-area.scrubbing i.cur { opacity: .9; }
 .spark-area.scrubbing i.hot { opacity: 1; background: linear-gradient(180deg, var(--accent-2), var(--accent)); box-shadow: 0 0 18px -2px rgba(252,76,2,.75); }
 .spark-tip {

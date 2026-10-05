@@ -308,7 +308,7 @@
             </div>
             ${ring(pct, 'of record')}
           </div>
-          <div class="spark-area" tabindex="0" role="slider" aria-label="Weekly club distance. Use arrow keys to scrub, Enter to open the week." aria-valuemin="1" aria-valuemax="${weeks.length}" aria-valuenow="${week.idx + 1}">
+          <div class="spark-area" tabindex="0" role="slider" aria-label="Weekly club distance. Use arrow keys to scrub." aria-valuemin="1" aria-valuemax="${weeks.length}" aria-valuenow="${week.idx + 1}">
             <span class="spark-tip" aria-hidden="true"></span>
             ${weeks.map((w, i) => `<i class="${w === week ? 'cur' : ''}${w.km >= recordKm ? ' rec' : ''}" style="--h:${(w.km / maxWeekKm * 100).toFixed(1)}%;--i:${i}"></i>`).join('')}
           </div>
@@ -381,22 +381,16 @@
     };
 
     area.addEventListener('pointermove', e => point(idxAt(e.clientX)));
-    area.addEventListener('pointerdown', e => {
-      const i = idxAt(e.clientX);
-      if (e.pointerType !== 'mouse' && at === i && tip.classList.contains('show')) { openWeek(i); return; }
-      point(i);
-    });
+    area.addEventListener('pointerdown', e => point(idxAt(e.clientX)));
     area.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') reset(); });
     area.addEventListener('pointerup', e => {
       if (e.pointerType !== 'mouse') { clearTimeout(restoreTimer); restoreTimer = setTimeout(reset, 2600); }
     });
-    area.addEventListener('click', e => { if (e.pointerType === 'mouse' || !e.pointerType) openWeek(idxAt(e.clientX)); });
     area.addEventListener('keydown', e => {
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         e.preventDefault();
         point(Math.max(0, Math.min(bars.length - 1, (at == null ? home.idx : at) + (e.key === 'ArrowLeft' ? -1 : 1))));
-      } else if (e.key === 'Enter' && at != null) openWeek(at);
-      else if (e.key === 'Escape') reset();
+      } else if (e.key === 'Escape') reset();
     });
     area.addEventListener('blur', reset);
   }
@@ -448,8 +442,7 @@
   function renderHistory(el) {
     const METRICS = { km: ['Total km', w => w.km, 1], runners: ['Runners', w => w.runners, 0], runs: ['Runs', w => w.runs, 0] };
     let metric = 'km';
-    let sel = pendingWeek != null ? weeks[pendingWeek] : (lastWeek || current);
-    pendingWeek = null;
+    let sel = lastWeek || current;
     el.innerHTML = head('Archive', 'Every week', '', `${weeks.length} weeks of KFS, ${fmt(allKm, 0)} km in total. Tap a bar to open that week's board.`) + `
       <div class="card chart-card reveal">
         <div class="chart-top">
@@ -535,7 +528,6 @@
       if (w) select(w, true);
     }));
     el._step = d => { const w = weeks[sel.idx + d]; if (w) select(w, true); };
-    el._select = w => select(w, true);
     select(sel, false);
     requestAnimationFrame(() => { const sc = $('.chart-scroll', el); sc.scrollLeft = sc.scrollWidth; });
     K.reveal(el);
@@ -710,7 +702,6 @@
   const ROUTES = { 'this-week': 'week', 'last-week': 'last', 'history': 'history', 'all-time': 'alltime', 'records': 'records' };
   const RENDER = { week: renderWeek, last: renderLast, history: renderHistory, alltime: renderAllTime, records: renderRecords };
   const done = {};
-  let pendingWeek = null;
 
   // Landing view: a new week opens on Last Week until This Week passes the
   // threshold. Week totals only grow, so once over it stays on This Week until
@@ -718,11 +709,6 @@
   const THIS_WEEK_THRESHOLD_KM = 150;
   const defaultRoute = () => (current.km > THIS_WEEK_THRESHOLD_KM || !lastWeek) ? 'this-week' : 'last-week';
   const resolve = route => (route === 'home' || !ROUTES[route]) ? defaultRoute() : route;
-  function openWeek(i) {
-    pendingWeek = i;
-    if (location.hash !== '#history') history.pushState(null, '', '#history');
-    show('history', true);
-  }
   let active = null;
 
   // Scroll target that puts the section heading just below the nav.
@@ -747,11 +733,6 @@
       RENDER[view](el);
       K.reveal(el);
       done[view] = true;
-    }
-    if (view === 'history' && pendingWeek != null) {
-      const h = document.getElementById('view-history');
-      h._select && h._select(weeks[pendingWeek]);
-      pendingWeek = null;
     }
     $$('[role="tab"][data-route]').forEach(b => b.setAttribute('aria-selected', ROUTES[b.dataset.route] === view));
     moveIndicators();
