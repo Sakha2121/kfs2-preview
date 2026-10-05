@@ -750,6 +750,59 @@ input { font: inherit; color: inherit; }
   background: url("brand/kfs-logo-white.svg") no-repeat center / contain; opacity: .14; pointer-events: none;
 }
 
+/* ── intro: logo reveal → flies into the nav logo ─────────────
+   Only rendered while <html class="intro"> (set in <head>, once per visit).
+   The failsafe hides it after 7s even if intro.js never runs. */
+.intro-screen { display: none; }
+html.intro { overflow: hidden; }
+html.intro .intro-screen {
+  display: block; position: fixed; inset: 0; z-index: 200; cursor: pointer;
+  animation: intro-failsafe .01s 7s forwards;
+}
+@keyframes intro-failsafe { to { visibility: hidden; pointer-events: none; } }
+.intro-screen::before { content: ""; position: absolute; inset: 0; background: radial-gradient(70% 60% at 50% 50%, #141110, #0A0A0B 70%); transition: opacity .7s var(--ease) .1s; }
+.intro-screen.out::before { opacity: 0; }
+.intro-stage { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 28px; }
+.intro-mark { position: relative; width: min(62vw, 460px); aspect-ratio: 613 / 201; transform-origin: 0 0; will-change: transform; }
+.intro-mark img {
+  display: block; width: 100%; height: 100%;
+  filter: drop-shadow(0 10px 40px rgba(252,76,2,.45));
+  clip-path: inset(0 100% 0 0);
+  transform: translateX(-28px) skewX(-14deg);
+  animation: intro-wipe .75s cubic-bezier(.7,0,.2,1) .3s forwards, intro-settle .9s cubic-bezier(.22,1.4,.36,1) .3s forwards;
+}
+@keyframes intro-wipe { to { clip-path: inset(0 0 0 0); } }
+@keyframes intro-settle { to { transform: none; } }
+.intro-streak {
+  position: absolute; top: -12%; bottom: -12%; left: 0; width: 10px; margin-left: -5px;
+  background: linear-gradient(180deg, transparent, #FFB38A 20%, #fff 50%, #FFB38A 80%, transparent);
+  box-shadow: 0 0 24px 6px rgba(252,76,2,.8); border-radius: 6px;
+  transform: skewX(-14deg); opacity: 0;
+  animation: intro-streak .75s cubic-bezier(.7,0,.2,1) .3s forwards;
+}
+@keyframes intro-streak { 0% { left: 0; opacity: 1; } 85% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+.intro-bar { width: 140px; height: 2px; border-radius: 2px; background: rgba(255,255,255,.1); overflow: hidden; transition: opacity .3s; }
+.intro-bar i { display: block; height: 100%; width: 0; background: #FC4C02; animation: intro-bar 1.4s cubic-bezier(.3,0,.2,1) .4s forwards; }
+.intro-screen.ready .intro-bar i { width: 100% !important; animation: none; transition: width .2s; }
+@keyframes intro-bar { to { width: 85%; } }
+.intro-lines i {
+  position: absolute; right: 0; height: 2px; width: var(--w); top: var(--y); border-radius: 2px;
+  background: linear-gradient(90deg, #FC4C02, rgba(252,76,2,0));
+  transform: translateX(110vw); opacity: .9;
+  animation: intro-line var(--t) cubic-bezier(.6,0,.3,1) var(--d) forwards;
+}
+.intro-lines i:nth-child(1) { --y: 38%; --w: 34vw; --d: 0s;   --t: .7s; }
+.intro-lines i:nth-child(2) { --y: 46%; --w: 52vw; --d: .08s; --t: .65s; height: 3px; }
+.intro-lines i:nth-child(3) { --y: 55%; --w: 28vw; --d: .16s; --t: .7s; }
+.intro-lines i:nth-child(4) { --y: 61%; --w: 44vw; --d: .05s; --t: .8s; opacity: .5; }
+.intro-lines i:nth-child(5) { --y: 32%; --w: 22vw; --d: .2s;  --t: .6s; opacity: .5; }
+@keyframes intro-line { to { transform: translateX(-120vw); } }
+.intro-screen.out .intro-bar, .intro-screen.out .intro-lines { opacity: 0; }
+/* hold the nav logo and the hero's own entrance until the intro hands over */
+html.intro .brand-logo { opacity: 0; }
+html.intro:not(.intro-leaving) .hero .ch,
+html.intro:not(.intro-leaving) .hero .fade-up { animation-play-state: paused; }
+
 /* ── responsive ────────────────────────────────────────────── */
 @media (max-width: 980px) {
   .tabs { display: none; }

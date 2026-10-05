@@ -11,6 +11,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="assets/brand/kfs-icon-32.png">
 <link rel="apple-touch-icon" href="assets/brand/kfs-icon-180.png">
 <script>try{var t=localStorage.getItem('kfs2-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<script>try{if(!sessionStorage.getItem('kfs2-intro')&&!matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('intro');setTimeout(function(){document.documentElement.classList.remove('intro','intro-leaving')},8000)}}catch(e){}</script>
 <!-- Google Analytics: only on the real domain, so localhost previews don't skew stats -->
 <script>
   if (location.hostname.endsWith('kneesforspeed.com')) {
@@ -31,6 +32,14 @@
 <link rel="stylesheet" href="assets/kfs2.css">
 </head>
 <body>
+<!-- intro: logo reveal that flies into the nav (assets/intro.js); shown once per visit -->
+<div class="intro-screen" aria-hidden="true">
+  <div class="intro-lines"><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="intro-stage">
+    <div class="intro-mark"><img src="assets/brand/kfs-logo.svg" alt="" width="613" height="201"><span class="intro-streak"></span></div>
+    <div class="intro-bar"><i></i></div>
+  </div>
+</div>
 <div class="progress" aria-hidden="true"></div>
 <div class="top-blur" aria-hidden="true"><i></i><i></i><i></i></div>
 
@@ -1014,5 +1023,6 @@ const nameAliases = {
 </script>
 <script src="assets/core.js"></script>
 <script src="assets/app.js"></script>
+<script src="assets/intro.js"></script>
 </body>
 </html>
