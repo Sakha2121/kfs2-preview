@@ -451,7 +451,7 @@
         </div>
         <div class="chart-scroll"><div class="chart" role="group" aria-label="Weekly totals">
           <div class="chart-grid" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-          ${weeks.map((w, i) => `<button class="wbar${w.live ? ' live' : ''}${w.km >= recordKm ? ' record' : ''}" data-i="${i}" aria-pressed="false" aria-label="${esc(w.label)}"><span class="wbar-fill" style="--i:${i}"></span><span class="wbar-lbl">${w.live ? 'Live' : esc(w.short.replace(/^(\w{3}) /, '$1 '))}</span></button>`).join('')}
+          ${weeks.map((w, i) => `<button class="wbar${w.live ? ' live' : ''}" data-i="${i}" aria-pressed="false" aria-label="${esc(w.label)}"><span class="wbar-fill" style="--i:${i}"></span><span class="wbar-lbl">${w.live ? 'Live' : esc(w.short.replace(/^(\w{3}) /, '$1 '))}</span></button>`).join('')}
         </div></div>
         <div class="tip" role="status"></div>
       </div>
@@ -468,6 +468,7 @@
     function drawMetric() {
       const [lbl, f, dec] = METRICS[metric];
       const max = Math.max(...weeks.map(f), 1);
+      bars.forEach((b, i) => b.classList.toggle('record', f(weeks[i]) === max));   // star the top week for this metric
       const top = Math.ceil(max / (dec ? 50 : 10)) * (dec ? 50 : 10);
       bars.forEach((b, i) => $('.wbar-fill', b).style.setProperty('--h', `calc(${(f(weeks[i]) / top * 100).toFixed(2)}% - 26px * ${(f(weeks[i]) / top).toFixed(3)})`));
       $$('.chart-grid span', el).forEach((s, i) => { s.textContent = fmt(top * (1 - i / 4), 0); });
