@@ -290,7 +290,7 @@
   }
 
   // Stats bento + podium + board for one week.
-  function renderLeague(el, week) {
+  function renderLeague(el, week, flat = false) {
     const list = week.athletes;
     if (!list.length) { el.innerHTML = emptyWeek(); K.reveal(el); return; }
     const prev = weeks[week.idx - 1];
@@ -319,7 +319,7 @@
         <div class="card tile spot reveal" style="--d:.2s"><div class="tile-lbl">Fastest pace</div><div><div class="tile-val num">${fast ? esc(fast.pace) : '--'}<small>/km</small></div><div class="tile-sub">${fast ? esc(pretty(fast.name)) : 'Runs of 3 km+'}</div></div></div>
       </div>
       <div data-podium></div>
-      <div class="card board reveal" data-board></div>`;
+      ${(flat ? x => `<div class="flat-sec">${x}</div>` : x => band('Board', x))(secHead('Full leaderboard', plural(list.length, 'runner')) + '<div class="card board reveal" data-board></div>')}`;
     const rows = list.map((a, i) => ({ ...a, delta: deltaFor(week, a.name, i + 1) }));
     const board = mountBoard($('[data-board]', el), rows, 'week', week.idx);
     $('[data-podium]', el).replaceWith(podium(list.slice(0, 3).map(a => ({
@@ -419,6 +419,13 @@
   setInterval(tick, 1000);
 
   // ── views ────────────────────────────────────────────────────
+  // Section break inside a view: title, hairline, optional meta on the right.
+  function secHead(title, meta = '', cls = '') {
+    return `<div class="sec-head ${cls} reveal"><h3 class="sec-title">${title}</h3><span class="sec-rule"></span>${meta ? `<span class="sec-meta">${meta}</span>` : ''}</div>`;
+  }
+  // Full-bleed tinted strip so the eye gets a clear break between sections.
+  const band = (mark, inner) => `<section class="band" data-mark="${mark}">${inner}</section>`;
+
   function head(eyebrow, title, meta = '', lede = '', cls = '') {
     return `<div class="view-head reveal"><div><div class="eyebrow">${eyebrow}</div><h2 class="h2 ${cls}">${title}</h2>${lede ? `<p class="lede">${lede}</p>` : ''}</div>${meta ? `<div class="head-meta">${meta}</div>` : ''}</div>`;
   }
@@ -455,12 +462,13 @@
         </div></div>
         <div class="tip" role="status"></div>
       </div>
+      <section class="band" data-mark="Weeks">${secHead('Open any week')}
       <div class="chips week-chips" role="group" aria-label="Weeks">${weeks.slice().reverse().map(w => `<button class="chip" data-i="${w.idx}" aria-pressed="false">${w.live ? '● Live' : esc(w.short)}</button>`).join('')}</div>
       <div class="week-panel">
         <div class="week-panel-head"><div><div class="eyebrow" data-wp-eyebrow></div><h3 class="h3" style="margin:0" data-wp-title></h3></div>
           <div class="week-nav"><button class="icon-btn" data-step="-1" aria-label="Previous week">${ICON.left}</button><button class="icon-btn" data-step="1" aria-label="Next week">${ICON.right}</button></div></div>
         <div data-league></div>
-      </div>`;
+      </div></section>`;
 
     const chart = $('.chart', el), card = $('.chart-card', el), tip = $('.tip', el);
     const bars = $$('.wbar', el), chips = $$('.week-chips .chip', el);
@@ -493,7 +501,7 @@
       drawMetric();
       const league = $('[data-league]', el);
       league.style.opacity = 0;
-      renderLeague(league, w);
+      renderLeague(league, w, true);
       requestAnimationFrame(() => { league.style.transition = 'opacity .4s'; league.style.opacity = 1; });
     }
     function showTip(b) {
@@ -552,7 +560,7 @@
         </div>
       </div>
       <div data-podium></div>
-      <div class="card board reveal" data-board></div>`;
+      ${band('Board', secHead('All-time leaderboard', plural(allTime.length, 'runner')) + '<div class="card board reveal" data-board></div>')}`;
     const rows = allTime.map((a, i) => {
       const p = prevAllRank.get(a.name), d = p ? p - (i + 1) : 0;
       return { ...a, delta: d ? { cls: d > 0 ? 'up' : 'down', txt: `${d > 0 ? '▲' : '▼'}${Math.abs(d)}`, title: 'Movement this week' } : null };
@@ -612,7 +620,7 @@
     el.innerHTML = head('Hall of Fame', 'Club records', '', 'The fastest times, biggest weeks and most stubborn streaks in KFS history.') + `
       <div class="chips" role="group" aria-label="Distance">${DIST.map(([k, l], i) => `<button class="chip" data-d="${k}" aria-pressed="${i === 0}">${l}</button>`).join('')}</div>
       <div data-speed></div>
-      <h3 class="h3 reveal">Individual records</h3>
+      <section class="band" data-mark="Legends">${secHead('Individual records')}
       <div class="ind-grid">${IND.map(([key, unit, lbl], i) => {
         const e = ind[key] || [], f = e[0];
         if (!f) return '';
@@ -624,8 +632,8 @@
           ${f.week ? `<div class="ind-week">${esc(f.week)}</div>` : ''}
           <div class="ind-ups">${e.slice(1).map((x, j) => `<div><span>${j + 2}. ${esc(pretty(x.name))}</span><span>${x.val} ${unit}</span></div>`).join('')}</div>
         </div>`;
-      }).join('')}</div>
-      <h3 class="h3 reveal">Club records</h3>
+      }).join('')}</div></section>
+      ${secHead('Club records', '', 'spaced')}
       <div class="club-grid">
         ${club.bestWeekKm ? `<div class="card club spot reveal"><div><div class="club-lbl">Biggest week</div><div class="club-week">${esc(club.bestWeekKm.week)}</div><div class="club-sub">${club.bestWeekKm.runners} runners</div></div><div class="club-val num"><span data-count="${club.bestWeekKm.val}" data-dec="1">0</span><small>km</small></div></div>` : ''}
         ${club.mostRunners ? `<div class="card club spot reveal" style="--d:.06s"><div><div class="club-lbl">Most runners</div><div class="club-week">${esc(club.mostRunners.week)}</div><div class="club-sub">${fmt(club.mostRunners.km, 1)} km total</div></div><div class="club-val num"><span data-count="${club.mostRunners.val}">0</span><small>runners</small></div></div>` : ''}
