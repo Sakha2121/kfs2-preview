@@ -371,7 +371,7 @@
     if (!out) return;
     try {
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': out.file })]);
-      note.textContent = 'Copied. Paste it into any chat.';
+      note.textContent = 'Copied';
     } catch (e) { note.textContent = 'Copy is blocked here. Use Save instead.'; }
   });
 

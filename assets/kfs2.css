@@ -931,7 +931,7 @@ html.intro:not(.intro-leaving) .hero .fade-up { animation-play-state: paused; }
      app.js sets --fx on the week views: the room left between the podium and
      the tab bar. It's shared out across the gaps, the bar chart and the podium
      cards (shares add up to 1), so the top 3 always ends just above the tab bar. */
-  .view-head { margin-bottom: max(10px, calc(16px + var(--fx, 0px) * .08)); gap: 4px; }
+  .view-head { margin-bottom: max(8px, calc(14px + var(--fx, 0px) * .08)); gap: 4px; }
   .view-head > div:first-child { flex: 1 1 100%; min-width: 0; }
   .h2.h2-date { white-space: nowrap; font-size: 28px; }   /* app.js fits it to the column */
   .head-meta { text-align: left; font-size: 12px; }
@@ -941,41 +941,41 @@ html.intro:not(.intro-leaving) .hero .fade-up { animation-play-state: paused; }
   .share-sheet .sheet-title { font-size: 26px; }
   .share-sheet .sheet-sub { margin-bottom: 14px; }
   .share-preview img { max-height: 58vh; }
-  .bento { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; }
   .tile { min-height: 0; }
-  .tile.big { grid-column: 1 / -1; grid-row: auto; padding: 18px 20px 16px; margin-bottom: max(8px, calc(10px + var(--fx, 0px) * .04)); }
-  .tile.big .tile-val { font-size: 60px; margin-top: 6px; }
-  .tile.big .tile-sub { margin-top: 6px; }
-  .ring { width: 78px; height: 78px; }
-  .spark-area { margin-top: 18px; height: max(26px, calc(44px + var(--fx, 0px) * .26)); }
-  /* the four small stats become one joined strip */
-  .tile:not(.big) { padding: max(10px, calc(14px + var(--fx, 0px) * .04)) 12px max(11px, calc(15px + var(--fx, 0px) * .04)); border-radius: 0; border-left-width: 0; box-shadow: none; justify-content: flex-start; }
-  .bento > .tile:not(.big):is(:first-child, .big + .tile) { border-left-width: 1px; border-radius: 16px 0 0 16px; }
-  .bento > .tile:not(.big):last-child { border-radius: 0 16px 16px 0; }
-  .tile:not(.big) .tile-lbl { font-size: 10.5px; letter-spacing: .05em; white-space: nowrap; }
-  .tile:not(.big) .tile-lbl[data-short] { font-size: 0; gap: 0; }
-  .tile:not(.big) .tile-lbl[data-short]::after { content: attr(data-short); font-size: 10.5px; }
-  .tile:not(.big) .tile-val { font-size: 26px; margin-top: 8px; white-space: nowrap; }
-  .tile:not(.big) .tile-sub { display: none; }
+  .tile.big { grid-column: 1 / -1; grid-row: auto; padding: 16px 18px 14px; margin-bottom: max(8px, calc(10px + var(--fx, 0px) * .04)); }
+  .tile.big .tile-val { font-size: 56px; margin-top: 4px; }
+  .tile.big .tile-sub { margin-top: 4px; }
+  .ring { width: 72px; height: 72px; }
+  .spark-area { margin-top: 14px; height: max(24px, calc(40px + var(--fx, 0px) * .26)); }
+  /* the four small stats: one joined 2×2 card, every label and detail kept */
+  .tile:not(.big) { padding: max(7px, calc(11px + var(--fx, 0px) * .02)) 13px; border-radius: 0; box-shadow: none; justify-content: flex-start; }
+  .bento > :nth-child(1 of .tile:not(.big)) { border-radius: 16px 0 0 0; }
+  .bento > :nth-child(2 of .tile:not(.big)) { border-radius: 0 16px 0 0; border-left-width: 0; }
+  .bento > :nth-child(3 of .tile:not(.big)) { border-radius: 0 0 0 16px; border-top-width: 0; }
+  .bento > :nth-child(4 of .tile:not(.big)) { border-radius: 0 0 16px 0; border-left-width: 0; border-top-width: 0; }
+  .tile:not(.big) .tile-lbl { font-size: 10px; letter-spacing: .05em; white-space: nowrap; }
+  .tile:not(.big) .tile-val { font-size: 25px; margin-top: 5px; white-space: nowrap; }
+  .tile:not(.big) .tile-sub { font-size: 10.5px; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   /* podium: winner full width, 2nd and 3rd side by side, avatar beside the name */
   .podium { grid-template-columns: 1fr 1fr; grid-template-areas: "first first" "second third"; align-items: stretch; gap: max(8px, calc(10px + var(--fx, 0px) * .04)) 10px; margin-top: max(8px, calc(10px + var(--fx, 0px) * .04)); }
-  .pod { padding: max(7px, calc(15px + var(--fx, 0px) * .11)) 16px; border-radius: 18px; min-height: 0; }
+  .pod { padding: max(6px, calc(13px + var(--fx, 0px) * .11)) 16px; border-radius: 18px; min-height: 0; }
   .pod-1 { grid-area: first; } .pod-2 { grid-area: second; } .pod-3 { grid-area: third; }
   .pod:not(.pod-empty) {
     display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: 12px; row-gap: 2px; align-items: center; align-content: center;
     grid-template-areas: "medal medal" "av name" "av km" "meta meta";
   }
-  .pod-medal { grid-area: medal; justify-self: start; margin-bottom: 8px; font-size: 10px; padding: 3px 9px; }
+  .pod-medal { grid-area: medal; justify-self: start; margin-bottom: 6px; font-size: 10px; padding: 3px 9px; }
   .pod .av, .pod .av-lg { grid-area: av; margin: 0; width: 40px; height: 40px; font-size: 13px; }
   .pod-name { grid-area: name; font-size: 16px; align-self: end; }
-  .pod-km { grid-area: km; font-size: 27px; margin-top: 0; align-self: start; }
-  .pod-meta { grid-area: meta; font-size: 11px; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pod-km { grid-area: km; font-size: 26px; margin-top: 0; align-self: start; }
+  .pod-meta { grid-area: meta; font-size: 11px; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .pod-rank { font-size: 64px; top: -6px; bottom: auto; right: -2px; }
-  .pod-1:not(.pod-empty) { grid-template-columns: 58px minmax(0, 1fr); column-gap: 16px; grid-template-areas: "av medal" "av name" "av km" "av meta"; padding-inline: 18px; padding-block: max(7px, calc(15px + var(--fx, 0px) * .12)); }
+  .pod-1:not(.pod-empty) { grid-template-columns: 58px minmax(0, 1fr); column-gap: 16px; grid-template-areas: "av medal" "av name" "av km" "av meta"; padding-inline: 18px; padding-block: max(6px, calc(13px + var(--fx, 0px) * .12)); }
   .pod-1 .pod-medal { margin-bottom: 6px; }
-  .pod-1 .av, .pod-1 .av-lg { width: 58px; height: 58px; font-size: 19px; }
+  .pod-1 .av, .pod-1 .av-lg { width: 54px; height: 54px; font-size: 18px; }
   .pod-1 .pod-name { font-size: 22px; }
-  .pod-1 .pod-km { font-size: 38px; }
+  .pod-1 .pod-km { font-size: 35px; }
   .pod-1 .pod-meta { margin-top: 4px; font-size: 12px; }
   .pod-1 .pod-rank { font-size: 132px; top: auto; bottom: -30px; right: 8px; }
   .flex-strip { margin-top: 104px; padding: 20px; }   /* starts just below the screenshot frame */
@@ -1042,6 +1042,18 @@ html.intro:not(.intro-leaving) .hero .fade-up { animation-play-state: paused; }
   .crew-grid { grid-template-columns: 1fr; }   /* a lone crew card goes full width, landscape */
   .crew-grid .member-photos { aspect-ratio: 4 / 3; }
   .join-band::before { width: 320px; bottom: -12%; }
+}
+/* short phones: a slightly tighter screenshot frame so the top 3 still clears the tab bar */
+@media (max-width: 640px) and (max-height: 820px) {
+  .tile.big { padding: 13px 16px 11px; }
+  .tile.big .tile-val { font-size: 48px; }
+  .ring { width: 62px; height: 62px; }
+  .spark-area { margin-top: 10px; }
+  .tile:not(.big) { padding-block: 7px 8px; }
+  .tile:not(.big) .tile-val { font-size: 23px; margin-top: 3px; }
+  .pod-1 .av, .pod-1 .av-lg { width: 48px; height: 48px; font-size: 16px; }
+  .pod-1 .pod-km { font-size: 31px; }
+  .pod-km { font-size: 24px; }
 }
 @media (hover: none) {
   .spot::before, .spot::after { display: none; }

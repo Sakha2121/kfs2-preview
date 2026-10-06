@@ -454,7 +454,7 @@
     const pace = a => validPace(a) ? a.pace + '/km' : '--';
     const top10 = w.athletes.slice(0, 10);
     KFSShare.open({
-      title: 'Flex your week', sub: 'Send it to the group, post it, or save it.', start,
+      title: 'Flex your week', sub: 'Post it, save it, or share it to the family group chat.', start,
       cards: [
         { key: 'week', label: 'The week', alt: `${w.label}: ${fmt(w.km, 1)} km and the top 3`, data: { ...base, kind: 'week', slug,
           kmStr: fmt(w.km, 1), pct: w.km / recordKm,
