@@ -11,7 +11,13 @@
   const btnShare = $('[data-share-native]'), btnSave = $('[data-share-save]'), btnCopy = $('[data-share-copy]');
   const titleEl = $('#share-title'), subEl = $('[data-share-sub]');
 
-  const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  // Designs the sheet pages through with the arrows beside the preview.
+  // Colours mirror the light / dark tokens in kfs2.css; a new design (another
+  // palette, later another format) is one more entry here.
+  const STYLES = [
+    { key: 'light', label: 'Light', T: { bg: '#F4F1EC', surface: '#FFFFFF', surface3: '#ECE7DF', line: 'rgba(24,18,10,.16)', text: '#161412', muted: '#86817A', spark: '#CBC1B2', gold: '#D49C12', silver: '#8A93A1', bronze: '#B66A38', up: '#12A150', down: '#E5484D' } },
+    { key: 'dark', label: 'Dark', T: { bg: '#0A0A0B', surface: '#141417', surface3: '#25252B', line: 'rgba(255,255,255,.15)', text: '#F5F3EF', muted: '#7F7B75', spark: '#4A4A54', gold: '#F4C14F', silver: '#C8CDD6', bronze: '#D58B5B', up: '#3DDC84', down: '#FF5F57' } },
+  ];
   const logo = new Image();
   logo.src = 'assets/brand/kfs-logo.svg';
 
@@ -93,16 +99,12 @@
 
   // ── shared frame: background, header, title, footer, and a layout that
   //    shares the free height out as gaps between blocks (by weight) ──
-  function frame(d, blocksFor) {
+  function frame(d, style, blocksFor) {
     const H = heightFor();
     const c = document.createElement('canvas');
     c.width = W; c.height = H;
     const ctx = c.getContext('2d');
-    const T = {
-      bg: css('--bg'), surface: css('--surface'), surface3: css('--surface-3'), line: css('--line-2'),
-      text: css('--text'), muted: css('--muted'), spark: css('--spark'),
-      accent: '#FC4C02', accent2: '#FF8A3D', gold: css('--gold'), silver: css('--silver'), bronze: css('--bronze'),
-    };
+    const T = { accent: '#FC4C02', accent2: '#FF8A3D', ...style.T };
     const IW = W - PAD * 2, top = 110, bottom = H - 160;
 
     ctx.fillStyle = T.bg; ctx.fillRect(0, 0, W, H);
@@ -171,35 +173,39 @@
   const MEDAL = T => [T.gold, T.silver, T.bronze];
 
   // ── card: the week ──────────────────────────────────────────
-  function drawWeek(d) {
-    return frame(d, G => {
+  function drawWeek(d, style) {
+    return frame(d, style, G => {
       const { ctx, T, IW } = G;
       const [p1, p2, p3] = d.top;
-      const ROW1 = 236, ROW = 200;
+      // tall phone-shaped images get roomy sizes; a 9:16 story uses a tighter set
+      const roomy = G.H >= 2100;
+      const TOT = roomy ? 380 : 330, BARS = roomy ? 120 : 92, CELL = roomy ? 180 : 148;
+      const ROW1 = roomy ? 236 : 200, ROW = roomy ? 200 : 168;
       return [
-        { h: 380, gap: 1, draw: total },
-        { h: 120, gap: .45, draw: y => bars(y, 120) },
-        { h: 150, gap: .45, draw: strip },
+        { h: TOT, gap: 1, draw: total },
+        { h: BARS, gap: .45, draw: y => bars(y, BARS) },
+        { h: CELL * 2, gap: .45, draw: stats },
         { h: 52 + (p1 ? ROW1 + 18 : 0) + (p2 ? ROW + 18 : 0) + (p3 ? ROW : 0), gap: 1.2, draw: podium },
       ];
 
       function total(y) {
-        card(ctx, PAD, y, IW, 380, 44, T.surface, T.line);
-        caps(ctx, 'TOTAL DISTANCE', PAD + 50, y + 72, 26, T.muted);
-        valueUnit(ctx, PAD + 46, y + 252, d.kmStr, 184, 'km', 66, T.text, T.muted);
+        const k = TOT / 380;
+        card(ctx, PAD, y, IW, TOT, 44, T.surface, T.line);
+        caps(ctx, 'TOTAL DISTANCE', PAD + 50, y + 72 * k, 26, T.muted);
+        valueUnit(ctx, PAD + 46, y + 252 * k, d.kmStr, 184 * k, 'km', 66 * k, T.text, T.muted);
         font(ctx, 500, 30, BODY); ctx.fillStyle = T.muted;
-        ctx.fillText(d.sub, PAD + 50, y + 318);
-        const rx = W - PAD - 146, ry = y + 190, rr = 92;
-        ctx.lineWidth = 20; ctx.lineCap = 'round';
+        ctx.fillText(d.sub, PAD + 50, y + 318 * k);
+        const rx = W - PAD - 146, ry = y + TOT / 2, rr = 92 * k;
+        ctx.lineWidth = 20 * k; ctx.lineCap = 'round';
         ctx.beginPath(); ctx.arc(rx, ry, rr, 0, Math.PI * 2); ctx.strokeStyle = T.surface3; ctx.stroke();
         const rg = ctx.createLinearGradient(rx - rr, ry - rr, rx + rr, ry + rr);
         rg.addColorStop(0, T.accent); rg.addColorStop(1, T.accent2);
         ctx.beginPath(); ctx.arc(rx, ry, rr, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.min(d.pct, 1));
         ctx.strokeStyle = rg; ctx.stroke(); ctx.lineCap = 'butt';
-        font(ctx, 800, 48, DISPLAY, 'condensed'); ctx.fillStyle = T.text; ctx.textAlign = 'center';
-        ctx.fillText(Math.round(d.pct * 100) + '%', rx, ry + 10);
+        font(ctx, 800, 48 * k, DISPLAY, 'condensed'); ctx.fillStyle = T.text; ctx.textAlign = 'center';
+        ctx.fillText(Math.round(d.pct * 100) + '%', rx, ry + 10 * k);
         font(ctx, 600, 15, BODY); ctx.letterSpacing = '1.5px'; ctx.fillStyle = T.muted;
-        ctx.fillText('OF RECORD', rx, ry + 40); ctx.letterSpacing = '0px'; ctx.textAlign = 'left';
+        ctx.fillText('OF RECORD', rx, ry + 40 * k); ctx.letterSpacing = '0px'; ctx.textAlign = 'left';
       }
       // every week so far, this one in orange
       function bars(y, maxH) {
@@ -210,18 +216,32 @@
           ctx.fillStyle = w.cur ? T.accent : T.spark; ctx.fill();
         });
       }
-      function strip(y) {
-        card(ctx, PAD, y, IW, 150, 32, T.surface, T.line);
-        const cw = IW / 4;
-        d.stats.forEach(([lbl, val, unit], i) => {
-          const x = PAD + i * cw;
-          if (i) { ctx.fillStyle = T.line; ctx.fillRect(x, y + 1, 2, 148); }
-          caps(ctx, lbl.toUpperCase(), x + 28, y + 52, 22, T.muted);
-          valueUnit(ctx, x + 26, y + 120, val, 64, unit, 26, T.text, T.muted);
+      // the four stats as one joined 2×2 card, like the phone page: label, value, detail line
+      function stats(y) {
+        const cw = IW / 2, k = CELL / 166;
+        card(ctx, PAD, y, IW, CELL * 2, 34, T.surface, T.line);
+        ctx.fillStyle = T.line;
+        ctx.fillRect(PAD + cw - 1, y + 1, 2, CELL * 2 - 2);
+        ctx.fillRect(PAD + 1, y + CELL - 1, IW - 2, 2);
+        d.stats.forEach((st, i) => {
+          const x = PAD + (i % 2) * cw + 36, top = y + Math.floor(i / 2) * CELL, maxW = cw - 60;
+          caps(ctx, st.label.toUpperCase(), x, top + 48 * k, 22, T.muted);
+          valueUnit(ctx, x - 2, top + 106 * k, st.value, 60 * k, st.unit, 26 * k, T.text, T.muted);
+          // coloured ▲/▼ change first, then the muted text; shrinks if it would overflow the cell
+          const sub = st.sub || {}, lead = sub.lead || '', text = sub.text || '';
+          let size = 24;
+          font(ctx, 500, size, BODY);
+          const w = ctx.measureText(lead + text).width;
+          if (w > maxW) { size = Math.floor(size * maxW / w); font(ctx, 500, size, BODY); }
+          const sy = top + CELL - 26 * k;
+          let sx = x;
+          if (lead) { ctx.fillStyle = T[sub.dir] || T.muted; ctx.fillText(lead, sx, sy); sx += ctx.measureText(lead).width; }
+          if (text) { ctx.fillStyle = T.muted; ctx.fillText(text, sx, sy); }
         });
       }
-      // one full-width row per podium place
+      // one full-width row per podium place; sizes scale with the row height
       function place(y, h, p, rank, col, big) {
+        const k = h / (big ? 236 : 200);
         rrect(ctx, PAD, y, IW, h, 36);
         ctx.fillStyle = T.surface; ctx.fill();
         if (big) {
@@ -231,15 +251,15 @@
         }
         ctx.lineWidth = 2; ctx.strokeStyle = big ? col + '80' : T.line; ctx.stroke();
         ctx.save(); rrect(ctx, PAD, y, IW, h, 36); ctx.clip();
-        outlineNumber(ctx, rank, W - PAD - 34, y + h + (big ? 50 : 40), big ? 300 : 250, col);
+        outlineNumber(ctx, rank, W - PAD - 34, y + h + (big ? 50 : 40) * k, (big ? 300 : 250) * k, col);
         ctx.restore();
-        const r = big ? 70 : 54, x = PAD + 40 + r * 2 + 34;
+        const r = (big ? 70 : 54) * k, x = PAD + 40 + r * 2 + 34;
         avatar(ctx, PAD + 40 + r, y + h / 2, r, p.initials, p.color, T.surface);
-        pill(ctx, x, y + (big ? 30 : 26), (big ? '★ ' : '') + ['1ST', '2ND', '3RD'][rank - 1], col, big ? 22 : 20);
-        fit(ctx, p.name.toUpperCase(), 900, big ? 58 : 46, IW - (x - PAD) - 230, 'expanded');
-        ctx.fillStyle = T.text; ctx.fillText(p.name.toUpperCase(), x, y + (big ? 136 : 116));
-        const ks = big ? 62 : 50, ky = y + h - (big ? 32 : 30);
-        const kw = valueUnit(ctx, x - 2, ky, p.big, ks, p.unit, big ? 28 : 24, T.text, T.muted);
+        pill(ctx, x, y + (big ? 30 : 26) * k, (big ? '★ ' : '') + ['1ST', '2ND', '3RD'][rank - 1], col, (big ? 22 : 20) * k);
+        fit(ctx, p.name.toUpperCase(), 900, (big ? 58 : 46) * k, IW - (x - PAD) - 230, 'expanded');
+        ctx.fillStyle = T.text; ctx.fillText(p.name.toUpperCase(), x, y + (big ? 136 : 116) * k);
+        const ks = (big ? 62 : 50) * k, ky = y + h - (big ? 32 : 30) * k;
+        const kw = valueUnit(ctx, x - 2, ky, p.big, ks, p.unit, (big ? 28 : 24) * k, T.text, T.muted);
         font(ctx, 500, big ? 26 : 24, BODY); ctx.fillStyle = T.muted;
         ctx.fillText('·  ' + p.meta, x + kw + 22, ky - 3);
       }
@@ -254,8 +274,8 @@
   }
 
   // ── card: the leaderboard top 10 ────────────────────────────
-  function drawBoard(d) {
-    return frame(d, G => {
+  function drawBoard(d, style) {
+    return frame(d, style, G => {
       const { ctx, T, IW } = G;
       const n = d.rows.length, GAP = 12;
       // rows take what's left after the fixed blocks and a minimum of breathing room
@@ -295,7 +315,7 @@
           ctx.fillText(r.sub, nx, mid + rh * .26);
           if (r.delta) {
             const sw = ctx.measureText(r.sub).width;
-            const col = r.delta.cls === 'up' ? '#2FBF71' : r.delta.cls === 'down' ? '#E8505B' : T.accent;
+            const col = T[r.delta.cls] || T.accent;
             pill(ctx, nx + sw + 16, mid + rh * .26 - Math.min(25, rh * .2) * 1.15, r.delta.txt, col, Math.min(18, rh * .15));
           }
           // km, right-aligned
@@ -309,26 +329,44 @@
   const DRAW = { week: drawWeek, board: drawBoard };
 
   // ── sheet wiring ────────────────────────────────────────────
-  let cards = [], current = null;
-  const cache = new Map();   // card key -> { file, url }
+  // Two choices: which card (the switch above the preview) and which design
+  // (arrows / swipe beside it). Each pair is drawn once, then cached.
+  const prev = $('[data-style-prev]'), next = $('[data-style-next]');
+  const dots = $('[data-style-dots]'), styleName = $('[data-style-name]'), preview = $('.share-preview');
+  let cards = [], activeCard = null, styleIdx = 0, ready = null;   // ready: the image shown, for share / save / copy
+  const cache = new Map();   // "card:style" -> Promise<{ file, url }>
 
-  async function render(key) {
-    current = key;
-    [...seg.children].forEach(b => b.setAttribute('aria-pressed', b.dataset.card === key));
-    let out = cache.get(key);
-    if (!out) {
-      [btnShare, btnSave, btnCopy].forEach(b => { b.disabled = true; });
-      const c = cards.find(x => x.key === key);
-      const canvas = DRAW[c.data.kind](c.data);
+  function build(cardKey, s) {
+    const k = cardKey + ':' + s.key;
+    if (!cache.has(k)) cache.set(k, (async () => {
+      const c = cards.find(x => x.key === cardKey);
+      const canvas = DRAW[c.data.kind](c.data, s);
       const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
-      out = { file: new File([blob], `kfs-${c.data.slug}.png`, { type: 'image/png' }), url: URL.createObjectURL(blob) };
-      cache.set(key, out);
-      [btnShare, btnSave, btnCopy].forEach(b => { b.disabled = false; });
-    }
-    if (current !== key) return;
+      return { file: new File([blob], `kfs-${c.data.slug}-${s.key}.png`, { type: 'image/png' }), url: URL.createObjectURL(blob) };
+    })());
+    return cache.get(k);
+  }
+
+  async function show(dir = 0) {
+    const s = STYLES[styleIdx], key = activeCard;
+    [...seg.children].forEach(b => b.setAttribute('aria-pressed', b.dataset.card === key));
+    [...dots.children].forEach((b, i) => b.classList.toggle('on', i === styleIdx));
+    styleName.textContent = s.label;
+    ready = null;
+    [btnShare, btnSave, btnCopy].forEach(b => { b.disabled = true; });
+    const out = await build(key, s);
+    if (activeCard !== key || STYLES[styleIdx] !== s) return;   // moved on while it drew
+    ready = out;
+    [btnShare, btnSave, btnCopy].forEach(b => { b.disabled = false; });
     img.src = out.url;
-    img.alt = cards.find(x => x.key === key).alt;
+    img.alt = `${cards.find(x => x.key === key).alt}, ${s.label.toLowerCase()} design`;
+    if (dir && !window.KFS.reduce) img.animate([{ opacity: 0, transform: `translateX(${dir * 28}px)` }, { opacity: 1, transform: 'none' }], { duration: 280, easing: 'cubic-bezier(.22,1,.36,1)' });
     note.textContent = '';
+    STYLES.forEach(x => build(key, x));   // draw the other designs now so paging is instant
+  }
+  function step(dir) {
+    styleIdx = (styleIdx + dir + STYLES.length) % STYLES.length;
+    show(dir);
   }
 
   // opts: { title, sub, cards: [{ key, label, alt, data }], start }
@@ -338,39 +376,63 @@
       document.fonts.load('600 26px Inter'), document.fonts.load('700 26px Inter'), document.fonts.load('500 26px Inter'),
       logo.decode ? logo.decode().catch(() => {}) : null,
     ]);
-    cache.forEach(v => URL.revokeObjectURL(v.url));
+    cache.forEach(p => p.then(v => URL.revokeObjectURL(v.url)));
     cache.clear();
     cards = opts.cards;
+    activeCard = opts.start || cards[0].key;
+    // open on the design that matches the site's current theme
+    const theme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+    styleIdx = Math.max(0, STYLES.findIndex(x => x.key === theme));
     titleEl.textContent = opts.title;
     subEl.textContent = opts.sub;
     seg.hidden = cards.length < 2;
     seg.innerHTML = cards.map(c => `<button type="button" data-card="${c.key}" aria-pressed="false">${c.label}</button>`).join('');
-    await render(opts.start || cards[0].key);
-    const f = cache.get(current).file;
-    btnShare.hidden = !(navigator.canShare && navigator.canShare({ files: [f] }));
+    dots.innerHTML = STYLES.map((x, i) => `<button type="button" data-style="${i}" aria-label="${x.label} design"></button>`).join('');
+    prev.hidden = next.hidden = STYLES.length < 2;
+    await show();
+    btnShare.hidden = !(navigator.canShare && navigator.canShare({ files: [ready.file] }));
     btnCopy.hidden = !(window.ClipboardItem && navigator.clipboard && navigator.clipboard.write);
     window.KFS.openSheet('share');
   }
 
-  seg.addEventListener('click', e => { const b = e.target.closest('[data-card]'); if (b) render(b.dataset.card); });
+  seg.addEventListener('click', e => { const b = e.target.closest('[data-card]'); if (b) { activeCard = b.dataset.card; show(); } });
+  prev.addEventListener('click', () => step(-1));
+  next.addEventListener('click', () => step(1));
+  dots.addEventListener('click', e => {
+    const b = e.target.closest('[data-style]');
+    if (!b || +b.dataset.style === styleIdx) return;
+    const i = +b.dataset.style, dir = i > styleIdx ? 1 : -1;
+    styleIdx = i; show(dir);
+  });
+  // swipe the preview sideways to page through designs
+  let sx = null;
+  preview.addEventListener('pointerdown', e => { sx = e.clientX; e.stopPropagation(); });   // keeps the sheet's drag-to-close out of it
+  preview.addEventListener('pointerup', e => {
+    if (sx == null) return;
+    const dx = e.clientX - sx; sx = null;
+    if (Math.abs(dx) > 40) step(dx < 0 ? 1 : -1);
+  });
+  preview.addEventListener('pointercancel', () => { sx = null; });
+  sheet.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') step(-1);
+    else if (e.key === 'ArrowRight') step(1);
+  });
+
   btnShare.addEventListener('click', () => {
     // called straight from the tap so iOS keeps the user gesture
-    const out = cache.get(current);
-    if (out) navigator.share({ files: [out.file], title: 'Knees For Speed' }).catch(() => {});
+    if (ready) navigator.share({ files: [ready.file], title: 'Knees For Speed' }).catch(() => {});
   });
   btnSave.addEventListener('click', () => {
-    const out = cache.get(current);
-    if (!out) return;
+    if (!ready) return;
     const a = document.createElement('a');
-    a.href = out.url; a.download = out.file.name;
+    a.href = ready.url; a.download = ready.file.name;
     document.body.appendChild(a); a.click(); a.remove();
     note.textContent = 'Saved to your downloads.';
   });
   btnCopy.addEventListener('click', async () => {
-    const out = cache.get(current);
-    if (!out) return;
+    if (!ready) return;
     try {
-      await navigator.clipboard.write([new ClipboardItem({ 'image/png': out.file })]);
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': ready.file })]);
       note.textContent = 'Copied';
     } catch (e) { note.textContent = 'Copy is blocked here. Use Save instead.'; }
   });

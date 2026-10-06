@@ -740,8 +740,21 @@ input { font: inherit; color: inherit; }
 .sheet-title { font-family: var(--font-display); font-weight: 900; font-stretch: 118%; font-size: 34px; text-transform: uppercase; line-height: .95; letter-spacing: -.02em; }
 .sheet-sub { color: var(--muted); font-size: 14px; margin: 8px 0 20px; }
 .share-sheet { width: min(440px, 100%); }
-.share-preview { display: flex; justify-content: center; }
-.share-preview img { display: block; width: auto; max-width: 100%; height: auto; max-height: 60vh; border-radius: 16px; border: 1px solid var(--line); box-shadow: 0 20px 40px -24px rgba(0,0,0,.6); }
+.share-preview { position: relative; display: flex; justify-content: center; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.share-arrow {
+  position: absolute; z-index: 1; top: 50%; translate: 0 -50%;
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--surface-2); border: 1px solid var(--line-2); box-shadow: var(--shadow);
+}
+.share-arrow.prev { left: 0; }
+.share-arrow.next { right: 0; }
+.share-arrow[hidden] { display: none; }
+.share-arrow svg { width: 18px; height: 18px; }
+.share-pager { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.share-dots { display: flex; gap: 6px; }
+.share-dots button { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 99px; background: var(--line-2); cursor: pointer; transition: width .3s var(--ease), background .3s; }
+.share-dots button.on { width: 22px; background: var(--accent); }
+.share-preview img { display: block; width: auto; max-width: calc(100% - 108px); height: auto; max-height: min(60vh, calc(90vh - 330px)); border-radius: 16px; border: 1px solid var(--line); box-shadow: 0 20px 40px -24px rgba(0,0,0,.6); }
 .share-actions { display: flex; gap: 8px; margin-top: 14px; }
 .share-actions .btn { flex: 1; gap: 8px; padding: 0 12px; min-width: 0; }
 .share-actions [data-share-native] { flex: 1.4; }
@@ -940,7 +953,7 @@ html.intro:not(.intro-leaving) .hero .fade-up { animation-play-state: paused; }
   .share-btn { position: absolute; top: -8px; right: 0; height: 34px; padding: 0 13px; border-radius: 11px; }   /* sits on the eyebrow row */
   .share-sheet .sheet-title { font-size: 26px; }
   .share-sheet .sheet-sub { margin-bottom: 14px; }
-  .share-preview img { max-height: 58vh; }
+  .share-preview img { max-height: min(52vh, calc(88vh - 330px)); }   /* leaves room for the switch, pager and buttons */
   .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; }
   .tile { min-height: 0; }
   .tile.big { grid-column: 1 / -1; grid-row: auto; padding: 16px 18px 14px; margin-bottom: max(8px, calc(10px + var(--fx, 0px) * .04)); }

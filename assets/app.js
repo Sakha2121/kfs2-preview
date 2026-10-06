@@ -263,11 +263,18 @@
     </svg>`;
   }
 
-  function trend(cur, prev, unit = '') {
-    if (prev == null) return '';
+  // Change vs the previous week: null (no previous week), { same }, or { dir, lead: '▲ 5' }.
+  function change(cur, prev, unit = '') {
+    if (prev == null) return null;
     const d = r1(cur - prev);
-    if (!d) return `<span>Same as previous week</span>`;
-    return `<span style="color:var(--${d > 0 ? 'up' : 'down'})">${d > 0 ? '▲' : '▼'} ${fmt(Math.abs(d), Number.isInteger(d) ? 0 : 1)}${unit}</span> vs previous week`;
+    if (!d) return { same: true };
+    return { dir: d > 0 ? 'up' : 'down', lead: `${d > 0 ? '▲' : '▼'} ${fmt(Math.abs(d), Number.isInteger(d) ? 0 : 1)}${unit}` };
+  }
+  function trend(cur, prev, unit = '') {
+    const c = change(cur, prev, unit);
+    if (!c) return '';
+    if (c.same) return `<span>Same as previous week</span>`;
+    return `<span style="color:var(--${c.dir})">${c.lead}</span> vs previous week`;
   }
 
   function podium(items, onPick) {
@@ -448,7 +455,11 @@
   const fastest = list => list.filter(a => a.distance >= 3 && validPace(a)).sort((a, b) => a.paceVal - b.paceVal)[0];
   function shareWeek(w, start = 'week') {
     if (!window.KFSShare || !w.athletes.length) return;
-    const fast = fastest(w.athletes), maxKm = Math.max(...weeks.map(x => x.km), 1);
+    const fast = fastest(w.athletes), maxKm = Math.max(...weeks.map(x => x.km), 1), prevW = weeks[w.idx - 1];
+    const changeLine = (cur, prev) => {
+      const c = change(cur, prev);
+      return !c ? { text: '' } : c.same ? { text: 'Same as previous week' } : { dir: c.dir, lead: c.lead, text: ' vs previous week' };
+    };
     const base = { title: w.label, tag: w.live ? 'Live · This week' : 'Last week · Final', live: w.live };
     const slug = w.short.toLowerCase().replace(/\W+/g, '-');
     const pace = a => validPace(a) ? a.pace + '/km' : '--';
@@ -460,7 +471,12 @@
           kmStr: fmt(w.km, 1), pct: w.km / recordKm,
           sub: w.km >= recordKm ? '🏆  Club record week' : `${fmt(r1(recordKm - w.km), 1)} km off the club record`,
           weeks: weeks.map(x => ({ h: x.km / maxKm, cur: x === w })),
-          stats: [['Runners', String(w.runners), ''], ['Runs', String(w.runs), ''], ['Avg km', fmt(r1(w.km / w.runners), 1), 'km'], ['Best pace', fast ? fast.pace : '--', fast ? '/km' : '']],
+          stats: [
+            { label: 'Runners', value: String(w.runners), unit: '', sub: changeLine(w.runners, prevW && prevW.runners) },
+            { label: 'Runs logged', value: String(w.runs), unit: '', sub: changeLine(w.runs, prevW && prevW.runs) },
+            { label: 'Avg per runner', value: fmt(r1(w.km / w.runners), 1), unit: 'km', sub: { text: `${plural(w.athletes.filter(a => a.distance >= 10).length, 'runner')} hit 10 km+` } },
+            { label: 'Fastest pace', value: fast ? fast.pace : '--', unit: '/km', sub: { text: fast ? pretty(fast.name) : 'Runs of 3 km+' } },
+          ],
           top: w.athletes.slice(0, 3).map(a => ({ name: firstName(a.name), initials: initials(a.name), color: colorFor(a.name), big: String(a.distance), unit: 'km', meta: `${plural(a.runs, 'run')} · ${pace(a)}` })),
         } },
         { key: 'board', label: 'Leaderboard', alt: `${w.label}: top ${top10.length} runners`, data: { ...base, kind: 'board', slug: slug + '-top10',

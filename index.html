@@ -174,7 +174,12 @@
     <div class="sheet-title" id="share-title">Flex your week</div>
     <div class="sheet-sub" data-share-sub>Post it, save it, or share it to the family group chat.</div>
     <div class="seg share-seg" role="group" aria-label="Which image" data-share-seg hidden></div>
-    <div class="share-preview"><img data-share-img alt=""></div>
+    <div class="share-preview">
+      <button class="icon-btn share-arrow prev" type="button" data-style-prev aria-label="Previous design"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+      <img data-share-img alt="" draggable="false">
+      <button class="icon-btn share-arrow next" type="button" data-style-next aria-label="Next design"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+    </div>
+    <div class="share-pager"><span class="share-dots" data-style-dots></span><span data-style-name aria-live="polite"></span></div>
     <div class="share-actions">
       <button class="btn btn-primary" data-share-native hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>Share</button>
       <button class="btn btn-ghost" data-share-save><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>Save</button>
