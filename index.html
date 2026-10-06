@@ -166,6 +166,24 @@
   </div>
 </div>
 
+<!-- share sheet: preview of the week's share card (assets/share.js) -->
+<div class="sheet-overlay" id="share" role="dialog" aria-modal="true" aria-labelledby="share-title">
+  <div class="sheet share-sheet" tabindex="-1">
+    <div class="sheet-grab" aria-hidden="true"></div>
+    <button class="icon-btn sheet-close" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <div class="sheet-title" id="share-title">Flex your week</div>
+    <div class="sheet-sub" data-share-sub>Send it to the group, post it, or save it.</div>
+    <div class="seg share-seg" role="group" aria-label="Which image" data-share-seg hidden></div>
+    <div class="share-preview"><img data-share-img alt=""></div>
+    <div class="share-actions">
+      <button class="btn btn-primary" data-share-native hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>Share</button>
+      <button class="btn btn-ghost" data-share-save><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>Save</button>
+      <button class="btn btn-ghost" data-share-copy hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy</button>
+    </div>
+    <div class="share-note" data-share-note role="status"></div>
+  </div>
+</div>
+
 <!-- Data anchors kept in the exact shape scripts/update_leaderboard.py expects
      (week badge + one card per archived week). Hidden; the app reads them. -->
 <div id="data-src" hidden>
@@ -1022,6 +1040,7 @@ const nameAliases = {
 };
 </script>
 <script src="assets/core.js"></script>
+<script src="assets/share.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/intro.js"></script>
 </body>

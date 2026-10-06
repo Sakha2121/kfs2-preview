@@ -739,6 +739,34 @@ input { font: inherit; color: inherit; }
 .sheet-close { position: absolute; top: 16px; right: 16px; }
 .sheet-title { font-family: var(--font-display); font-weight: 900; font-stretch: 118%; font-size: 34px; text-transform: uppercase; line-height: .95; letter-spacing: -.02em; }
 .sheet-sub { color: var(--muted); font-size: 14px; margin: 8px 0 20px; }
+.share-sheet { width: min(440px, 100%); }
+.share-preview { display: flex; justify-content: center; }
+.share-preview img { display: block; width: auto; max-width: 100%; height: auto; max-height: 60vh; border-radius: 16px; border: 1px solid var(--line); box-shadow: 0 20px 40px -24px rgba(0,0,0,.6); }
+.share-actions { display: flex; gap: 8px; margin-top: 14px; }
+.share-actions .btn { flex: 1; gap: 8px; padding: 0 12px; min-width: 0; }
+.share-actions [data-share-native] { flex: 1.4; }
+.share-actions .btn[hidden] { display: none; }
+.share-actions svg { width: 18px; height: 18px; flex: none; }
+.share-note { min-height: 20px; margin-top: 10px; text-align: center; font-size: 13px; color: var(--muted); }
+.head-side { display: flex; align-items: flex-end; gap: 16px; }
+.share-seg { display: flex; margin: 0 0 14px; }
+.share-seg[hidden] { display: none; }
+.share-seg button { flex: 1; }
+.share-actions .btn:disabled { opacity: .5; pointer-events: none; }
+/* "Flex your week": the two share buttons after the podium */
+.flex-strip {
+  display: flex; align-items: center; justify-content: space-between; gap: 18px 24px; flex-wrap: wrap;
+  margin-top: 16px; padding: 22px 24px; border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
+  background: radial-gradient(120% 160% at 0% 0%, var(--accent-soft), transparent 60%), var(--surface);
+}
+.flex-title { font-family: var(--font-display); font-weight: 900; font-stretch: 118%; font-size: clamp(22px, 2.6vw, 30px); line-height: 1; text-transform: uppercase; letter-spacing: -.01em; }
+.flex-sub { color: var(--muted); font-size: 14px; margin-top: 6px; }
+.flex-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+.flex-btns .btn { gap: 8px; }
+.flex-btns svg { width: 18px; height: 18px; }
+.share-btn { gap: 8px; }
+.share-btn svg { width: 16px; height: 16px; }
 .join-opt {
   display: flex; align-items: center; gap: 14px; padding: 14px; margin-top: 8px;
   border-radius: 16px; border: 1px solid var(--line); background: var(--surface-2); text-decoration: none;
@@ -908,6 +936,11 @@ html.intro:not(.intro-leaving) .hero .fade-up { animation-play-state: paused; }
   .h2.h2-date { white-space: nowrap; font-size: 28px; }   /* app.js fits it to the column */
   .head-meta { text-align: left; font-size: 12px; }
   .head-meta br { display: none; }
+  .view-head { position: relative; }
+  .share-btn { position: absolute; top: -8px; right: 0; height: 34px; padding: 0 13px; border-radius: 11px; }   /* sits on the eyebrow row */
+  .share-sheet .sheet-title { font-size: 26px; }
+  .share-sheet .sheet-sub { margin-bottom: 14px; }
+  .share-preview img { max-height: 58vh; }
   .bento { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
   .tile { min-height: 0; }
   .tile.big { grid-column: 1 / -1; grid-row: auto; padding: 18px 20px 16px; margin-bottom: max(8px, calc(10px + var(--fx, 0px) * .04)); }
@@ -945,7 +978,10 @@ html.intro:not(.intro-leaving) .hero .fade-up { animation-play-state: paused; }
   .pod-1 .pod-km { font-size: 38px; }
   .pod-1 .pod-meta { margin-top: 4px; font-size: 12px; }
   .pod-1 .pod-rank { font-size: 132px; top: auto; bottom: -30px; right: 8px; }
-  #view-week .band, #view-last .band { margin-top: 112px; }   /* keep the board below the fold */
+  .flex-strip { margin-top: 104px; padding: 20px; }   /* starts just below the screenshot frame */
+  .flex-btns { width: 100%; flex-direction: column; }
+  .flex-btns .btn { width: 100%; }
+  #view-week .band, #view-last .band { margin-top: 56px; }
   .board-tools { padding: 10px; }
   .search { flex-basis: 100%; }
   .board-head { display: none; }

@@ -25,6 +25,7 @@
     search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
     left: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
     right: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
+    share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>',
   };
 
   // ── data model ────────────────────────────────────────────────
@@ -307,7 +308,7 @@
     const list = week.athletes;
     if (!list.length) { el.innerHTML = emptyWeek(); K.reveal(el); return; }
     const prev = weeks[week.idx - 1];
-    const fast = list.filter(a => a.distance >= 3 && validPace(a)).sort((a, b) => a.paceVal - b.paceVal)[0];
+    const fast = fastest(list);
     const pct = week.km / recordKm;
     const isRecord = week.km >= recordKm;
     el.innerHTML = `
@@ -332,6 +333,10 @@
         <div class="card tile spot reveal" style="--d:.2s"><div class="tile-lbl" data-short="Best pace">Fastest pace</div><div><div class="tile-val num">${fast ? esc(fast.pace) : '--'}<small>/km</small></div><div class="tile-sub">${fast ? esc(pretty(fast.name)) : 'Runs of 3 km+'}</div></div></div>
       </div>
       <div data-podium></div>
+      ${flat ? '' : `<div class="flex-strip reveal">
+        <div><div class="flex-title">Flex your week</div><div class="flex-sub">Show off the week, or the top 10, in the group chat.</div></div>
+        <div class="flex-btns"><button class="btn btn-primary" data-share-open="week">${ICON.share}Share the week</button><button class="btn btn-ghost" data-share-open="board">${ICON.share}Share the leaderboard</button></div>
+      </div>`}
       ${(flat ? x => `<div class="flat-sec">${x}</div>` : x => band('Board', x))(secHead('Full leaderboard', plural(list.length, 'runner')) + '<div class="card board reveal" data-board></div>')}`;
     const rows = list.map((a, i) => ({ ...a, delta: deltaFor(week, a.name, i + 1) }));
     const board = mountBoard($('[data-board]', el), rows, 'week', week.idx);
@@ -339,6 +344,7 @@
       name: a.name, count: a.distance, unit: 'km', meta: `${plural(a.runs, 'run')} · ${validPace(a) ? a.pace + '/km' : '--'}`,
     })), name => board.focus(name)));
     if (!flat) scrubber($('[data-scrub-tile]', el), week);
+    $$('[data-share-open]', el).forEach(b => { b.onclick = () => shareWeek(week, b.dataset.shareOpen); });
     K.reveal(el);
   }
 
@@ -433,14 +439,44 @@
   // Full-bleed tinted strip so the eye gets a clear break between sections.
   const band = (mark, inner) => `<section class="band" data-mark="${mark}">${inner}</section>`;
 
-  function head(eyebrow, title, meta = '', lede = '', cls = '') {
-    return `<div class="view-head reveal"><div><div class="eyebrow">${eyebrow}</div><h2 class="h2 ${cls}">${title}</h2>${lede ? `<p class="lede">${lede}</p>` : ''}</div>${meta ? `<div class="head-meta">${meta}</div>` : ''}</div>`;
+  function head(eyebrow, title, meta = '', lede = '', cls = '', share = false) {
+    const side = (meta ? `<div class="head-meta">${meta}</div>` : '') + (share ? `<button class="btn btn-ghost btn-sm share-btn" data-share>${ICON.share}<span>Share</span></button>` : '');
+    return `<div class="view-head reveal"><div><div class="eyebrow">${eyebrow}</div><h2 class="h2 ${cls}">${title}</h2>${lede ? `<p class="lede">${lede}</p>` : ''}</div>${side ? `<div class="head-side">${side}</div>` : ''}</div>`;
+  }
+
+  // Share cards for one week (the week, and its top 10): share.js draws them.
+  const fastest = list => list.filter(a => a.distance >= 3 && validPace(a)).sort((a, b) => a.paceVal - b.paceVal)[0];
+  function shareWeek(w, start = 'week') {
+    if (!window.KFSShare || !w.athletes.length) return;
+    const fast = fastest(w.athletes), maxKm = Math.max(...weeks.map(x => x.km), 1);
+    const base = { title: w.label, tag: w.live ? 'Live · This week' : 'Last week · Final', live: w.live };
+    const slug = w.short.toLowerCase().replace(/\W+/g, '-');
+    const pace = a => validPace(a) ? a.pace + '/km' : '--';
+    const top10 = w.athletes.slice(0, 10);
+    KFSShare.open({
+      title: 'Flex your week', sub: 'Send it to the group, post it, or save it.', start,
+      cards: [
+        { key: 'week', label: 'The week', alt: `${w.label}: ${fmt(w.km, 1)} km and the top 3`, data: { ...base, kind: 'week', slug,
+          kmStr: fmt(w.km, 1), pct: w.km / recordKm,
+          sub: w.km >= recordKm ? '🏆  Club record week' : `${fmt(r1(recordKm - w.km), 1)} km off the club record`,
+          weeks: weeks.map(x => ({ h: x.km / maxKm, cur: x === w })),
+          stats: [['Runners', String(w.runners), ''], ['Runs', String(w.runs), ''], ['Avg km', fmt(r1(w.km / w.runners), 1), 'km'], ['Best pace', fast ? fast.pace : '--', fast ? '/km' : '']],
+          top: w.athletes.slice(0, 3).map(a => ({ name: firstName(a.name), initials: initials(a.name), color: colorFor(a.name), big: String(a.distance), unit: 'km', meta: `${plural(a.runs, 'run')} · ${pace(a)}` })),
+        } },
+        { key: 'board', label: 'Leaderboard', alt: `${w.label}: top ${top10.length} runners`, data: { ...base, kind: 'board', slug: slug + '-top10',
+          summary: [[fmt(w.km, 1), 'km'], [String(w.runners), 'runners'], [String(w.runs), 'runs']],
+          rows: top10.map((a, i) => ({ name: pretty(a.name), initials: initials(a.name), color: colorFor(a.name), km: fmt(a.distance, 1), sub: `${plural(a.runs, 'run')} · ${pace(a)}`, delta: deltaFor(w, a.name, i + 1) })),
+          more: w.athletes.length > 10 ? `+ ${plural(w.athletes.length - 10, 'more runner')} on kneesforspeed.com` : '',
+        } },
+      ],
+    });
   }
 
   function renderWeek(el) {
     el.innerHTML = head('<span class="pulse"></span> Live · This week', esc(current.label),
-      `Resets Monday 00:00 IST<br>in <strong data-cd-compact>–</strong>`, '', 'h2-date') + '<div data-league></div>';
+      `Resets Monday 00:00 IST<br>in <strong data-cd-compact>–</strong>`, '', 'h2-date', current.athletes.length > 0) + '<div data-league></div>';
     renderLeague($('[data-league]', el), current);
+    const sb = $('[data-share]', el); if (sb) sb.onclick = () => shareWeek(current);
     tick();
   }
 
@@ -448,8 +484,9 @@
     if (!lastWeek) { el.innerHTML = head('Last week', 'No archive yet'); return; }
     const w = lastWeek.athletes[0];
     el.innerHTML = head('Last week · Final', esc(lastWeek.label),
-      w ? `<span class="meta-winner">Winner<br><strong>${esc(pretty(w.name))} · ${w.distance} km</strong></span>` : '', '', 'h2-date') + '<div data-league></div>';
+      w ? `<span class="meta-winner">Winner<br><strong>${esc(pretty(w.name))} · ${w.distance} km</strong></span>` : '', '', 'h2-date', !!w) + '<div data-league></div>';
     renderLeague($('[data-league]', el), lastWeek);
+    $('[data-share]', el).onclick = () => shareWeek(lastWeek);
   }
 
   function renderHistory(el) {
