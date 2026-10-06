@@ -766,10 +766,10 @@ input { font: inherit; color: inherit; }
 .share-seg[hidden] { display: none; }
 .share-seg button { flex: 1; }
 .share-actions .btn:disabled { opacity: .5; pointer-events: none; }
-/* "Flex your week": the two share buttons after the podium */
+/* "Flex your week": the two share buttons, just below the full leaderboard */
 .flex-strip {
   display: flex; align-items: center; justify-content: space-between; gap: 18px 24px; flex-wrap: wrap;
-  margin-top: 16px; padding: 22px 24px; border-radius: var(--radius);
+  margin-top: 20px; padding: 22px 24px; border-radius: var(--radius);
   border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
   background: radial-gradient(120% 160% at 0% 0%, var(--accent-soft), transparent 60%), var(--surface);
 }
@@ -991,10 +991,10 @@ html.intro:not(.intro-leaving) .hero .fade-up { animation-play-state: paused; }
   .pod-1 .pod-km { font-size: 35px; }
   .pod-1 .pod-meta { margin-top: 4px; font-size: 12px; }
   .pod-1 .pod-rank { font-size: 132px; top: auto; bottom: -30px; right: 8px; }
-  .flex-strip { margin-top: 104px; padding: 20px; }   /* starts just below the screenshot frame */
+  .flex-strip { margin-top: 14px; padding: 20px; }
   .flex-btns { width: 100%; flex-direction: column; }
   .flex-btns .btn { width: 100%; }
-  #view-week .band, #view-last .band { margin-top: 56px; }
+  #view-week .band, #view-last .band { margin-top: 112px; }   /* keep the board below the screenshot frame */
   .board-tools { padding: 10px; }
   .search { flex-basis: 100%; }
   .board-head { display: none; }
