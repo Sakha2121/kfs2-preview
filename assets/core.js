@@ -5,26 +5,57 @@
   const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
   const KFS = (window.KFS = { reduce, fine });
 
-  // ── theme (circular reveal via View Transitions) ──────────────
+  // ── theme: the new theme bleeds out of the button and across the screen ──
   const THEME_KEY = 'kfs2-theme';
   const metaTheme = document.querySelector('meta[name="theme-color"]');
+  const BG = { light: '#F4F1EC', dark: '#0A0A0B' };
   function setTheme(t) {
     root.dataset.theme = t;
     try { localStorage.setItem(THEME_KEY, t); } catch (e) {}
-    if (metaTheme) metaTheme.content = t === 'light' ? '#F4F1EC' : '#0A0A0B';
+    if (metaTheme) metaTheme.content = BG[t];
   }
-  document.querySelectorAll('[data-theme-toggle]').forEach(btn => btn.addEventListener('click', () => {
-    const next = root.dataset.theme === 'light' ? 'dark' : 'light';
-    if (!document.startViewTransition || reduce) return setTheme(next);
+  const softEdge = window.CSS && CSS.supports('mask-image', 'radial-gradient(#000, transparent)');
+  function switchTheme(btn, next) {
     const r = btn.getBoundingClientRect();
     const x = r.left + r.width / 2, y = r.top + r.height / 2;
-    const end = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
-    document.startViewTransition(() => setTheme(next)).ready.then(() => {
-      root.animate(
-        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
-        { duration: 700, easing: 'cubic-bezier(.22,1,.36,1)', pseudoElement: '::view-transition-new(root)' }
-      );
-    });
+    const reach = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));   // to the farthest corner
+    const timing = { duration: 850, easing: 'cubic-bezier(.65,0,.25,1)', fill: 'both' };
+    root.classList.add('theme-switching');   // the sun / moon spins in
+    const done = () => root.classList.remove('theme-switching', 'theme-bleed');
+
+    if (reduce) {   // motion-sensitive: a short cross-fade instead of a spreading circle
+      if (!document.startViewTransition) { setTheme(next); return done(); }
+      const t = document.startViewTransition(() => setTheme(next));
+      t.ready.then(() => root.animate({ opacity: [0, 1] }, { duration: 220, easing: 'ease', pseudoElement: '::view-transition-new(root)' }));
+      return t.finished.then(done, done);
+    }
+    if (document.startViewTransition) {
+      // the browser freezes the old page; the new theme shows through a soft-edged circle that grows from the button
+      root.classList.add('theme-bleed');
+      const t = document.startViewTransition(() => setTheme(next));
+      t.ready.then(() => {
+        const d = reach * 2.7;   // diameter, with room for the soft edge to clear the corners
+        const kf = softEdge
+          ? { maskSize: ['0px 0px', `${d}px ${d}px`], maskPosition: [`${x}px ${y}px`, `${x - d / 2}px ${y - d / 2}px`] }
+          : { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${reach}px at ${x}px ${y}px)`] };
+        root.animate(kf, { ...timing, pseudoElement: '::view-transition-new(root)' });
+      });
+      return t.finished.then(done, done);
+    }
+    // no View Transitions (older iPhones, some in-app browsers): a soft-edged disc of the new
+    // background grows out of the button, the theme switches underneath, then the disc fades away
+    const d = reach * 2.7, flood = document.createElement('div');
+    flood.className = 'theme-flood';
+    Object.assign(flood.style, { left: `${x - d / 2}px`, top: `${y - d / 2}px`, width: `${d}px`, height: `${d}px`,
+      background: `radial-gradient(closest-side, ${BG[next]} 72%, transparent)` });
+    document.body.appendChild(flood);
+    flood.animate({ transform: ['scale(0)', 'scale(1)'] }, { ...timing, duration: 650 })
+      .finished.then(() => { setTheme(next); return flood.animate({ opacity: [1, 0] }, { duration: 380, easing: 'ease', fill: 'forwards' }).finished; })
+      .then(() => { flood.remove(); done(); }, () => { flood.remove(); setTheme(next); done(); });
+  }
+  document.querySelectorAll('[data-theme-toggle]').forEach(btn => btn.addEventListener('click', () => {
+    if (root.classList.contains('theme-switching')) return;   // ignore taps while it's already switching
+    switchTheme(btn, root.dataset.theme === 'light' ? 'dark' : 'light');
   }));
 
   // ── sheets (modal on desktop, draggable bottom sheet on mobile) ──

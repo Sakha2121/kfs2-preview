@@ -10,7 +10,7 @@
 <link rel="icon" type="image/svg+xml" href="assets/brand/kfs-icon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/brand/kfs-icon-32.png">
 <link rel="apple-touch-icon" href="assets/brand/kfs-icon-180.png">
-<script>try{var t=localStorage.getItem('kfs2-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<script>try{var t=localStorage.getItem('kfs2-theme');if(t){document.documentElement.dataset.theme=t;if(t==='light'){var m=document.querySelector('meta[name="theme-color"]');if(m)m.content='#F4F1EC'}}}catch(e){}</script>
 <script>try{if(!sessionStorage.getItem('kfs2-intro')&&!matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('intro');setTimeout(function(){document.documentElement.classList.remove('intro','intro-leaving')},8000)}}catch(e){}</script>
 <!-- Google Analytics: only on the real domain, so localhost previews don't skew stats -->
 <script>
@@ -66,13 +66,17 @@
 </header>
 
 <section class="hero" aria-label="Knees For Speed">
-  <div class="hero-media"><img src="https://github.com/user-attachments/assets/1ad6ab01-41c3-4ac3-8b93-d60dc85ade84" alt="" fetchpriority="high" onerror="this.remove()"></div>
   <div class="hero-inner">
     <div class="live-chip fade-up" style="--d:.1s"><span class="pulse"></span>Live · Week of <span data-badge></span></div>
     <h1 class="hero-title" data-split data-fit-title="196" aria-label="Knees For Speed">
       <span class="line" aria-hidden="true">Knees</span>
       <span class="line" aria-hidden="true">For <span class="accent">Speed</span></span>
     </h1>
+    <figure class="hero-frame">
+      <img src="images/hero-group.jpg" alt="Runners from a KFS group run" width="1079" height="841" fetchpriority="high" onerror="this.closest('figure').remove()">
+      <figcaption><span>After the run</span><span>8 cities · 1 leaderboard</span></figcaption>
+      <span class="frame-sticker" data-hero-stat></span>
+    </figure>
     <div class="hero-bottom">
       <div>
         <p class="hero-sub fade-up" style="--d:.7s">The run club for business students. Eight cities, one leaderboard, and every kilometre counts.</p>
@@ -87,15 +91,6 @@
           <button class="btn btn-primary magnetic" data-open="join">Run with us <span class="arrow">→</span></button>
         </div>
       </div>
-      <a class="scroll-badge fade-up" style="--d:1.1s" href="./" data-route="home" aria-label="Scroll to the leaderboard">
-        <svg class="scroll-ring" viewBox="0 0 120 120" aria-hidden="true">
-          <defs><path id="ring-path" d="M60,60 m-47,0 a47,47 0 1,1 94,0 a47,47 0 1,1 -94,0"/></defs>
-          <text><textPath href="#ring-path" textLength="293" lengthAdjust="spacing">Scroll · View the leaderboard ·</textPath></text>
-        </svg>
-        <span class="scroll-core" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
-        </span>
-      </a>
       <div class="countdown fade-up" style="--d:1s" aria-label="Time until the weekly leaderboard resets">
         <div class="countdown-label">Leaderboard resets in</div>
         <div class="cd">

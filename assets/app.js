@@ -754,11 +754,13 @@
   }
   function initHero() {
     $$('[data-badge]').forEach(e => { e.textContent = current.label; });
-    const media = $('.hero-media'), inner = $('.hero-inner');
-    if (!media || K.reduce) return;
+    // sticker on the hero photo: this week's km, or last week's while this week is still empty
+    const wk = current.km ? current : (lastWeek || current);
+    $$('[data-hero-stat]').forEach(e => { e.innerHTML = `<b>${fmt(wk.km, 1)}</b> km ${wk === current ? 'this week' : 'last week'}`; });
+    const inner = $('.hero-inner');
+    if (!inner || K.reduce) return;
     K.onScroll.push(y => {
       if (y > innerHeight * 1.2) return;
-      media.style.transform = `translate3d(0, ${(y * .35).toFixed(1)}px, 0) scale(${(1 + y * .00025).toFixed(4)})`;
       inner.style.transform = `translate3d(0, ${(y * .12).toFixed(1)}px, 0)`;
       inner.style.opacity = Math.max(0, 1 - y / (innerHeight * .85)).toFixed(3);
     });
