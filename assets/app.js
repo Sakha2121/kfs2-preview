@@ -490,7 +490,7 @@
 
   function renderWeek(el) {
     el.innerHTML = head('<span class="pulse"></span> Live · This week', esc(current.label),
-      `Resets Monday 00:00 IST<br>in <strong data-cd-compact>–</strong>`, '', 'h2-date', current.athletes.length > 0) + '<div data-league></div>';
+      `Resets Monday 00:00 IST <br>in <strong data-cd-compact>–</strong>`, '', 'h2-date', current.athletes.length > 0) + '<div data-league></div>';
     renderLeague($('[data-league]', el), current);
     const sb = $('[data-share]', el); if (sb) sb.onclick = () => shareWeek(current);
     tick();
@@ -500,7 +500,7 @@
     if (!lastWeek) { el.innerHTML = head('Last week', 'No archive yet'); return; }
     const w = lastWeek.athletes[0];
     el.innerHTML = head('Last week · Final', esc(lastWeek.label),
-      w ? `<span class="meta-winner">Winner<br><strong>${esc(pretty(w.name))} · ${w.distance} km</strong></span>` : '', '', 'h2-date', !!w) + '<div data-league></div>';
+      w ? `<span class="meta-winner">Winner <br><strong>${esc(pretty(w.name))} · ${w.distance} km</strong></span>` : '', '', 'h2-date', !!w) + '<div data-league></div>';
     renderLeague($('[data-league]', el), lastWeek);
     $('[data-share]', el).onclick = () => shareWeek(lastWeek);
   }
@@ -602,7 +602,7 @@
   function renderAllTime(el) {
     const EARTH = 40075;
     const pct = allKm / EARTH;
-    el.innerHTML = head(`Since ${esc(weeks[0].short)}`, 'All-time', `Totals across <strong>${weeks.length} weeks</strong><br>including the live week`) + `
+    el.innerHTML = head(`Since ${esc(weeks[0].short)}`, 'All-time', `Totals across <strong>${weeks.length} weeks</strong> <br>including the live week`) + `
       <div class="bento">
         <div class="card tile spot reveal"><div class="tile-lbl">Runners</div><div><div class="tile-val num" data-count="${allTime.length}">0</div><div class="tile-sub">have logged a run</div></div></div>
         <div class="card tile spot reveal" style="--d:.05s"><div class="tile-lbl">Total km</div><div><div class="tile-val num" data-count="${Math.round(allKm)}">0</div><div class="tile-sub">${fmt(r1(allKm / weeks.length), 1)} km per week</div></div></div>
@@ -618,7 +618,7 @@
         </div>
       </div>
       <div data-podium></div>
-      ${band('Board', secHead('All-time leaderboard', plural(allTime.length, 'runner')) + '<div class="card board reveal" data-board></div>')}`;
+      ${band('Board', secHead('Full leaderboard', plural(allTime.length, 'runner')) + '<div class="card board reveal" data-board></div>')}`;
     const rows = allTime.map((a, i) => {
       const p = prevAllRank.get(a.name), d = p ? p - (i + 1) : 0;
       return { ...a, delta: d ? { cls: d > 0 ? 'up' : 'down', txt: `${d > 0 ? '▲' : '▼'}${Math.abs(d)}`, title: 'Movement this week' } : null };
