@@ -743,7 +743,7 @@ html.theme-switching .theme-sun, html.theme-switching .theme-moon { animation: t
 }
 .tabbar.hide { transform: translateY(calc(100% + 24px)); }
 .tabbar-ind { position: absolute; top: 6px; bottom: 6px; left: 0; width: 0; border-radius: 16px; background: var(--accent-soft); transition: transform .45s var(--ease), width .45s var(--ease); }
-.tb { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 16px; font-size: 10px; font-weight: 600; color: var(--muted); transition: color .25s, transform .2s var(--ease); }
+.tb { position: relative; z-index: 1; display: flex; white-space: nowrap; letter-spacing: -.01em; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 16px; font-size: 10px; font-weight: 600; color: var(--muted); transition: color .25s, transform .2s var(--ease); }
 .tb svg { width: 22px; height: 22px; }
 .tb:active { transform: scale(.9); }
 .tb[aria-selected="true"] { color: var(--accent); }
@@ -933,11 +933,7 @@ html.intro:not(.intro-leaving) .hero-frame { animation-play-state: paused; }
   .club { flex-direction: column; align-items: flex-start; gap: 14px; }
   .club-week { white-space: normal; }
 }
-@media (min-width: 641px) {
-  .crew-grid .member:only-child { grid-column: span 2; }
-  .crew-grid .member:only-child .member-photos { aspect-ratio: 3 / 2; }
-  .crew-grid .member:only-child .member-photos img { object-position: center 25%; }
-}
+
 /* tablet only: one row of four stat tiles under the full-width distance card */
 @media (min-width: 641px) and (max-width: 980px) {
   .bento { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -1089,8 +1085,6 @@ html.intro:not(.intro-leaving) .hero-frame { animation-play-state: paused; }
   .member-name { font-size: 20px; }
   .member-role { font-size: 12px; }
   .member-info { padding: 10px 4px 4px; }
-  .crew-grid { grid-template-columns: 1fr; }   /* a lone crew card goes full width, landscape */
-  .crew-grid .member-photos { aspect-ratio: 4 / 3; }
   .join-band::before { width: 320px; bottom: -12%; }
 }
 /* short phones: a slightly tighter screenshot frame so the top 3 still clears the tab bar */
@@ -1212,3 +1206,6 @@ html.intro:not(.intro-leaving) .hero-frame { animation-play-state: paused; }
 .share-btn { border: 0; background: var(--accent-soft); color: var(--accent); font-weight: 700; transition: background .2s, transform .2s var(--ease); }
 .share-btn:hover { background: color-mix(in srgb, var(--accent) 20%, transparent); }
 .share-btn svg { width: 15px; height: 15px; stroke-width: 2.4; }
+/* caption link on the hero print: quiet, same type as the caption, underline on hover */
+.frame-link { color: inherit; text-decoration: none; text-underline-offset: 3px; transition: color .2s; }
+.frame-link:hover, .frame-link:focus-visible { color: var(--accent); text-decoration: underline; }
