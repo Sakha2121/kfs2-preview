@@ -846,12 +846,12 @@ html.theme-switching .theme-sun, html.theme-switching .theme-moon { animation: t
 .member-photos { position: relative; aspect-ratio: 3 / 4; border-radius: 16px; overflow: hidden; background: var(--surface-2); }
 .member-photos img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity .6s var(--ease), transform 1.2s var(--ease), filter .6s; }
 .member-photos .alt { opacity: 0; transform: scale(1.08); }
-.member:hover .member-photos .photo-main, .member.flipped .member-photos .photo-main { opacity: 0; transform: scale(1.06); }
-.member:hover .member-photos .alt, .member.flipped .member-photos .alt { opacity: 1; transform: scale(1); }
+.member.flipped .member-photos .photo-main { opacity: 0; transform: scale(1.06); }
+.member.flipped .member-photos .alt { opacity: 1; transform: scale(1); }
 .member-photos::after { content: ""; position: absolute; inset: 50% 0 0; background: linear-gradient(180deg, transparent, rgba(0,0,0,.55)); pointer-events: none; }
 .member-tag { position: absolute; z-index: 2; left: 12px; top: 12px; padding: 5px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; color: #fff; background: rgba(0,0,0,.35); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.2); }
 .member-swap { position: absolute; z-index: 2; right: 12px; top: 12px; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: rgba(0,0,0,.35); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.2); transition: transform .6s var(--ease); }
-.member:hover .member-swap, .member.flipped .member-swap { transform: rotate(180deg); }
+.member.flipped .member-swap { transform: rotate(180deg); }
 .member-swap svg { width: 14px; height: 14px; }
 .member-info { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; padding: 14px 8px 8px; transform: translateZ(20px); }
 .member-name { font-family: var(--font-display); font-weight: 900; font-stretch: 118%; font-size: 26px; text-transform: uppercase; line-height: .95; letter-spacing: -.01em; }
@@ -1275,4 +1275,11 @@ body:has(.team-wrap) .footer-word { margin-top: 0; }
 
 @media (max-width: 640px) {
   .footer-meta { margin-top: 16px; gap: 6px; }
+}
+
+/* second look: hover on mouse devices only (a tap would leave :hover stuck on phones); taps toggle .flipped */
+@media (hover: hover) {
+  .member:hover .member-photos .photo-main { opacity: 0; transform: scale(1.06); }
+  .member:hover .member-photos .alt { opacity: 1; transform: scale(1); }
+  .member:hover .member-swap { transform: rotate(180deg); }
 }

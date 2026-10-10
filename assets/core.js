@@ -58,6 +58,13 @@
     switchTheme(btn, root.dataset.theme === 'light' ? 'dark' : 'light');
   }));
 
+  // ── team cards: tap (or Enter / Space) flips to the second photo, tap again flips back ──
+  document.querySelectorAll('.member').forEach(card => {
+    const flip = () => { const on = card.classList.toggle('flipped'); card.setAttribute('aria-pressed', on); };
+    card.addEventListener('click', flip);
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); } });
+  });
+
   // ── sheets (modal on desktop, draggable bottom sheet on mobile) ──
   let lastFocus = null;
   function openSheet(id) {

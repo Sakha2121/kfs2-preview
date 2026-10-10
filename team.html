@@ -152,12 +152,5 @@
 </div>
 
 <script src="assets/core.js"></script>
-<script>
-  // Touch devices: tap a card to swap photos.
-  document.querySelectorAll('.member').forEach(card => {
-    card.addEventListener('click', () => { if (!window.KFS.fine) card.classList.toggle('flipped'); });
-    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.classList.toggle('flipped'); } });
-  });
-</script>
 </body>
 </html>
