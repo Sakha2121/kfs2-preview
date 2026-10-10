@@ -448,6 +448,7 @@
 
   function head(eyebrow, title, meta = '', lede = '', cls = '', share = false) {
     const side = (meta ? `<div class="head-meta">${meta}</div>` : '') + (share ? `<button class="btn btn-ghost btn-sm share-btn" data-share>${ICON.share}<span>Share</span></button>` : '');
+    if (cls === 'h2-date') title = title.replace(/\s*–\s*/g, '-');   // a short dash reads better in the wide display type
     return `<div class="view-head reveal"><div><div class="eyebrow">${eyebrow}</div><h2 class="h2 ${cls}">${title}</h2>${lede ? `<p class="lede">${lede}</p>` : ''}</div>${side ? `<div class="head-side">${side}</div>` : ''}</div>`;
   }
 
@@ -554,7 +555,7 @@
         sc.scrollTo({ left: b.offsetLeft - sc.clientWidth / 2, behavior: K.reduce ? 'auto' : 'smooth' });
       }
       $('[data-wp-eyebrow]', el).innerHTML = w.live ? '<span class="pulse"></span> Live week' : `Week ${w.idx + 1} of ${weeks.length}`;
-      $('[data-wp-title]', el).textContent = w.label;
+      $('[data-wp-title]', el).textContent = w.label.replace(/\s*–\s*/g, '-');
       $('[data-step="-1"]', el).disabled = w.idx === 0;
       $('[data-step="1"]', el).disabled = w.idx === weeks.length - 1;
       drawMetric();

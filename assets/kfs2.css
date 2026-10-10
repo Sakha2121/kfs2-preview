@@ -986,7 +986,8 @@ html.intro:not(.intro-leaving) .hero-frame { animation-play-state: paused; }
   .head-meta { text-align: left; font-size: 12px; }
   .head-meta br { display: none; }
   .view-head { position: relative; }
-  .share-btn { position: absolute; top: -8px; right: 0; height: 34px; padding: 0 13px; border-radius: 11px; }   /* sits on the eyebrow row */
+  .share-btn { position: absolute; top: -9px; right: 0; height: 32px; padding: 0 12px 0 10px; border-radius: 99px; }
+  .view-head .eyebrow { min-height: 32px; margin-bottom: 8px; padding-top: 0; }   /* the pill gets its own row above the date */
   .share-sheet .sheet-title { font-size: 26px; }
   .share-sheet .sheet-sub { margin-bottom: 14px; }
   .share-preview img { max-height: min(52vh, calc(88vh - 330px)); }   /* leaves room for the switch, pager and buttons */
@@ -1030,7 +1031,7 @@ html.intro:not(.intro-leaving) .hero-frame { animation-play-state: paused; }
   .flex-strip { margin-top: 14px; padding: 20px; }
   .flex-btns { width: 100%; flex-direction: column; }
   .flex-btns .btn { width: 100%; }
-  #view-week .band, #view-last .band { margin-top: 112px; }   /* keep the board below the screenshot frame */
+  #view-week .band, #view-last .band { margin-top: 48px; }
   .board-tools { padding: 10px; }
   .search { flex-basis: 100%; }
   .board-head { display: none; }
@@ -1206,3 +1207,8 @@ html.intro:not(.intro-leaving) .hero-frame { animation-play-state: paused; }
 @media (max-width: 640px) and (max-height: 820px) {
   .hero-frame { width: 72%; }
 }
+
+/* share: an orange-tinted pill, the one accent in the heading row */
+.share-btn { border: 0; background: var(--accent-soft); color: var(--accent); font-weight: 700; transition: background .2s, transform .2s var(--ease); }
+.share-btn:hover { background: color-mix(in srgb, var(--accent) 20%, transparent); }
+.share-btn svg { width: 15px; height: 15px; stroke-width: 2.4; }
