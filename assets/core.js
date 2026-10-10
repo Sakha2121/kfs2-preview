@@ -192,7 +192,9 @@
     if (nav) nav.classList.toggle('scrolled', y > 40);
     if (topBlur) topBlur.classList.toggle('on', y > 40);
     if (tabbar) {
-      if (y > lastY + 6 && y > 300) tabbar.classList.add('hide');
+      const atEnd = y + innerHeight >= document.documentElement.scrollHeight - 40;   // show it again at the footer
+      if (y > lastY + 6 && y > 300 && !atEnd) tabbar.classList.add('hide');
+      else if (atEnd) tabbar.classList.remove('hide');
       else if (y < lastY - 6 || y < 300) tabbar.classList.remove('hide');
     }
     KFS.onScroll.forEach(fn => fn(y));

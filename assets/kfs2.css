@@ -924,7 +924,7 @@ html.intro:not(.intro-leaving) .hero-frame { animation-play-state: paused; }
   .tabs { display: none; }
   .nav-actions { margin-left: auto !important; }
   .tabbar { display: grid; }
-  .footer { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }   /* clears the tab bar */
+  .footer { padding-bottom: calc(88px + env(safe-area-inset-bottom)); }   /* exactly clears the tab bar */
   .hero { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }   /* keep CTAs clear of the tab bar */
   .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ind-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1271,4 +1271,8 @@ body:has(.team-wrap) .footer-word { margin-top: 0; }
   .crew-grid .join-band p { font-size: 14px; }
   .crew-grid .join-band .btn { height: 42px; padding: 0 18px; font-size: 14px; }
   .crew-grid .join-band::before { width: 70%; right: -6%; bottom: -14%; }
+}
+
+@media (max-width: 640px) {
+  .footer-meta { margin-top: 16px; gap: 6px; }
 }
