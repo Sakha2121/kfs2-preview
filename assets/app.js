@@ -866,7 +866,9 @@
   buildMarquee();
   initHero();
   const initial = location.hash.slice(1);
+  // every fresh load or refresh opens on the hero; a tab in the address only picks which board is open
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   show(initial, false);                          // no hash: landing rule picks the view
-  if (ROUTES[initial]) requestAnimationFrame(() => scrollTo({ top: boardTop() }));
+  scrollTo(0, 0);
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(moveIndicators);
 })();
