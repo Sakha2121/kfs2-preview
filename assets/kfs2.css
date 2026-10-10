@@ -1185,7 +1185,7 @@ html.intro:not(.intro-leaving) .hero-frame { animation-play-state: paused; }
 }
 @media (max-width: 640px) {
   :root[data-theme="light"] .hero::before {
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844'%3E%3Cg fill='none' stroke='%23161412' stroke-opacity='.12' stroke-width='1.5'%3E%3Cpath d='M-20 165 H300 A85 85 0 0 1 300 335'/%3E%3Cpath d='M-20 151 H300 A99 99 0 0 1 300 349'/%3E%3Cpath d='M-20 137 H300 A113 113 0 0 1 300 363'/%3E%3Cpath d='M-20 123 H300 A127 127 0 0 1 300 377'/%3E%3Cpath d='M-20 109 H300 A141 141 0 0 1 300 391'/%3E%3Cpath d='M-20 95 H300 A155 155 0 0 1 300 405'/%3E%3Cpath d='M-20 81 H300 A169 169 0 0 1 300 419'/%3E%3C/g%3E%3Cg font-family='Helvetica Neue,Arial,sans-serif' font-weight='800' fill='%23161412' text-anchor='middle' font-size='10' fill-opacity='.3'%3E%3Ctext x='288' y='162'%3E1%3C/text%3E%3Ctext x='288' y='148'%3E2%3C/text%3E%3Ctext x='288' y='134'%3E3%3C/text%3E%3Ctext x='288' y='120'%3E4%3C/text%3E%3Ctext x='288' y='106'%3E5%3C/text%3E%3Ctext x='288' y='92'%3E6%3C/text%3E%3C/g%3E%3Cpath d='M300 81 V165' stroke='%23FC4C02' stroke-width='3' stroke-opacity='.9'/%3E%3C/svg%3E") left top / 100% auto no-repeat, radial-gradient(95% 42% at 60% 46%, rgba(252,76,2,.1), transparent 70%);
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844'%3E%3Cg fill='none' stroke='%23161412' stroke-opacity='.12' stroke-width='1.5'%3E%3Cpath d='M-20 130 H262 A214 214 0 0 1 262 558 H-20'/%3E%3Cpath d='M-20 117 H262 A227 227 0 0 1 262 571 H-20'/%3E%3Cpath d='M-20 104 H262 A240 240 0 0 1 262 584 H-20'/%3E%3Cpath d='M-20 91 H262 A253 253 0 0 1 262 597 H-20'/%3E%3Cpath d='M-20 78 H262 A266 266 0 0 1 262 610 H-20'/%3E%3Cpath d='M-20 65 H262 A279 279 0 0 1 262 623 H-20'/%3E%3Cpath d='M-20 52 H262 A292 292 0 0 1 262 636 H-20'/%3E%3C/g%3E%3Cg font-family='Helvetica Neue,Arial,sans-serif' font-weight='800' fill='%23161412' text-anchor='middle' font-size='10' fill-opacity='.3'%3E%3Ctext x='250' y='128'%3E1%3C/text%3E%3Ctext x='250' y='114'%3E2%3C/text%3E%3Ctext x='250' y='102'%3E3%3C/text%3E%3Ctext x='250' y='88'%3E4%3C/text%3E%3Ctext x='250' y='76'%3E5%3C/text%3E%3Ctext x='250' y='62'%3E6%3C/text%3E%3C/g%3E%3Cpath d='M262 52 V130' stroke='%23FC4C02' stroke-width='3' stroke-opacity='.9'/%3E%3C/svg%3E") left top / 100% auto no-repeat, radial-gradient(95% 42% at 60% 46%, rgba(252,76,2,.1), transparent 70%);
   }
 }
 
@@ -1209,3 +1209,18 @@ html.intro:not(.intro-leaving) .hero-frame { animation-play-state: paused; }
 /* caption link on the hero print: quiet, same type as the caption, underline on hover */
 .frame-link { color: inherit; text-decoration: none; text-underline-offset: 3px; transition: color .2s; }
 .frame-link:hover, .frame-link:focus-visible { color: var(--accent); text-decoration: underline; }
+
+/* team page: tighter rhythm, the footer follows the join band without a big empty gap */
+.team-label { margin: 36px 0 16px; }
+.join-band { margin-top: 44px; }
+body:has(.team-wrap) .footer { margin-top: 40px; border-top: 0; }
+@media (max-width: 640px) {
+  .join-band { margin-top: 32px; }
+  body:has(.team-wrap) .footer { margin-top: 24px; padding-top: 28px; }
+  .footer-word { margin-top: 24px; }
+}
+body:has(.team-wrap) .footer { padding-bottom: calc(32px + env(safe-area-inset-bottom)); }   /* no tab bar on the team page */
+body:has(.team-wrap) .footer-word { margin-top: 0; }
+.member-info > div:first-child { min-width: 0; }
+.member-name { overflow-wrap: anywhere; }
+@media (max-width: 640px) { .member-name { font-size: clamp(15px, 5vw, 20px); } }

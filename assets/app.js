@@ -461,7 +461,7 @@
       const c = change(cur, prev);
       return !c ? { text: '' } : c.same ? { text: 'Same as previous week' } : { dir: c.dir, lead: c.lead, text: ' vs previous week' };
     };
-    const base = { title: w.label, tag: w.live ? 'Live · This week' : 'Last week · Final', live: w.live };
+    const base = { title: w.label, tag: w.live ? 'Live · This week' : 'Last week', live: w.live };
     const slug = w.short.toLowerCase().replace(/\W+/g, '-');
     const pace = a => validPace(a) ? a.pace + '/km' : '--';
     const top10 = w.athletes.slice(0, 10);
@@ -500,7 +500,7 @@
   function renderLast(el) {
     if (!lastWeek) { el.innerHTML = head('Last week', 'No archive yet'); return; }
     const w = lastWeek.athletes[0];
-    el.innerHTML = head('Last week · Final', esc(lastWeek.label),
+    el.innerHTML = head('Last week', esc(lastWeek.label),
       w ? `<span class="meta-winner">Winner <br><strong>${esc(pretty(w.name))} · ${w.distance} km</strong></span>` : '', '', 'h2-date', !!w) + '<div data-league></div>';
     renderLeague($('[data-league]', el), lastWeek);
     $('[data-share]', el).onclick = () => shareWeek(lastWeek);
