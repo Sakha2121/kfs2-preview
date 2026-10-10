@@ -170,7 +170,7 @@
     if (el.dataset.count !== undefined) countUp(el);
     el.querySelectorAll && el.querySelectorAll('[data-count]').forEach(c => { if (!c.dataset.done) { c.dataset.done = 1; countUp(c); } });
     io.unobserve(el);
-  }), { rootMargin: '0px 0px -6% 0px', threshold: .05 });
+  }), { rootMargin: '0px 0px 12% 0px', threshold: 0 });   // start just before an element scrolls in, so nothing peeks in blank
   KFS.reveal = (scope = document) => {
     scope.querySelectorAll('.reveal:not(.in), .row:not(.in), .chart:not(.in), .earth:not(.in), .ring:not(.in), .tile:not(.in), [data-count]:not([data-done])').forEach(el => {
       if (el.dataset.count !== undefined && el.closest('.tile, .pod, .reveal')) return; // parent handles it
